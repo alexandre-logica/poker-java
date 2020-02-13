@@ -11,10 +11,10 @@ public class Deck {
 
 	// maximum number of cards
 	public static final int deckLength = SuitsEnum.values().length * RankEnum.values().length;
-	private static Card card;
-	public static final List<Card> FULLDECK = new ArrayList<>();
+	private Card card;
+	private List<Card> FULLDECK = new ArrayList<>();
 	
-	static{
+	public Deck() {
 		for(SuitsEnum suit : SuitsEnum.values()) {
 			for(RankEnum rank : RankEnum.values()) {
 				card = new Card();
@@ -23,15 +23,21 @@ public class Deck {
 				FULLDECK.add(card);
 			}
 		}
+		Collections.shuffle(FULLDECK);
 	}
 	
-    public static void shuffle() {
+    public void shuffle() {
         Collections.shuffle(FULLDECK);
     }
     
-    public static void showDeck() {
+    public void showDeck() {
         for(int i = 0; i < deckLength; i++) {
             System.out.println(FULLDECK.get(i));
         }
     }
+
+	public List<Card> getFULLDECK() {
+		return FULLDECK;
+	}
+
 }
