@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import br.com.alexandre.domain.ActionPlayer;
 import br.com.alexandre.domain.Deck;
 import br.com.alexandre.domain.Hand;
 import br.com.alexandre.domain.HandCard;
@@ -16,7 +15,6 @@ import br.com.alexandre.domain.Round;
 import br.com.alexandre.domain.Table;
 import br.com.alexandre.domain.TablePlayer;
 import br.com.alexandre.domain.aux.GenderEnum;
-import br.com.alexandre.domain.aux.StatusEnum;
 import br.com.alexandre.domain.aux.TypeCardEnum;
 
 public class Test {
@@ -31,6 +29,8 @@ public class Test {
 			setCards(hand, table.getTablePlayers());
 			hand.setRounds(runRounds(hand));
 			table.getHands().add(hand);
+			showCards(hand);
+			table.setGameOver(true);
 		}
 		
 	}
@@ -48,7 +48,7 @@ public class Test {
 		HandCard handcard;
 		HandPlayer handPlayer;
 		for(int x = 0; x < tablePlayers.size(); x++){
-			handPlayer = new HandPlayer(new Long(x), hand, tablePlayers.get(x), StatusEnum.IN.toString());
+			handPlayer = new HandPlayer(new Long(x), hand, tablePlayers.get(x));
 			for(int i = 0; i < 2; i++ ){
 				handPlayer.getCards().add(hand.getDeck().getFULLDECK().get(0));
 				hand.getDeck().getFULLDECK().remove(0);
@@ -67,6 +67,43 @@ public class Test {
 				handcard.setType(TypeCardEnum.RIVER.getValue());
 			hand.getHandCards().add(handcard);
 		}
+	}
+	
+	public void showHandCards(Hand hand) {
+		System.out.println();
+		System.out.println("*************** Table Cards ***************");
+		System.out.println();
+		System.out.println("##### Flop #####");
+		for(HandCard card : hand.getHandCards()) {
+			if(card.getType().equals(TypeCardEnum.FLOP.getValue())) {
+				System.out.println(card.getCard().getRank()+"-"+card.getCard().getSuit()+"-"+card.getCard().getSymbol());
+			}
+		}
+		for(HandCard card : hand.getHandCards()) {
+			if(card.getType().equals(TypeCardEnum.TURN.getValue())) {
+				System.out.println("##### Turn #####");
+				System.out.println(card.getCard().getRank()+"-"+card.getCard().getSuit()+"-"+card.getCard().getSymbol());
+			} else if(card.getType().equals(TypeCardEnum.RIVER.getValue())) {
+				System.out.println("##### River #####");
+				System.out.println(card.getCard().getRank()+"-"+card.getCard().getSuit()+"-"+card.getCard().getSymbol());
+			}
+		}
+	}
+	
+	public void showPlayerCards(Hand hand) {
+		System.out.println();
+		System.out.println("************** Players Cards **************");
+		System.out.println();
+		for(HandPlayer player : hand.getHandPlayers()) {
+			System.out.println("##### Player: "+player.getTablePlayer().getPlayer().getNickname()+" #####");
+			System.out.println(player.getCards().get(0).getRank()+"-"+player.getCards().get(0).getSuit()+"-"+player.getCards().get(0).getSymbol());
+			System.out.println(player.getCards().get(1).getRank()+"-"+player.getCards().get(1).getSuit()+"-"+player.getCards().get(1).getSymbol());
+		}
+	}
+	
+	public void showCards(Hand hand) {
+		showHandCards(hand);
+		showPlayerCards(hand);
 	}
 	
 	public List<Round> runRounds(Hand hand) {
@@ -106,7 +143,7 @@ public class Test {
 		players.add(pl3);
 		players.add(pl4);
 		
-		Table table = new Table(1L, 20.0, LocalDateTime.now(), false);
+		Table table = new Table(1L, 20.0, LocalDateTime.now());
 		
 		Test test = new Test();
 		test.playGame(table, players);

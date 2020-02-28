@@ -7,8 +7,8 @@ import java.util.List;
 public class Table {
 
 	private Long id;
-	private List<TablePlayer> tablePlayers = new ArrayList<>();
-	private List<Hand> hands = new ArrayList<>();
+	private List<TablePlayer> tablePlayers;
+	private List<Hand> hands;
 	private Double initialCashBet = 0.0;
 	private LocalDateTime gameStart;
 	private LocalDateTime gameFinish;
@@ -24,8 +24,8 @@ public class Table {
 		this.gameOver = gameOver;
 	}
 	
-	public Table(Long id, Double initialCashBet, LocalDateTime gameStart, Boolean gameOver) {
-		this(id, null, null, initialCashBet, gameStart, null, gameOver);
+	public Table(Long id, Double initialCashBet, LocalDateTime gameStart) {
+		this(id, new ArrayList<TablePlayer>(), new ArrayList<Hand>(), initialCashBet, gameStart, null, false);
 	}
 
 	public Long getId() {

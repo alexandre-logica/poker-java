@@ -20,6 +20,7 @@ public class Deck {
 				card = new Card();
 				card.setRank(rank.getValue());
 				card.setSuit(suit.getValue());
+				card.setSymbol(suit.getSymbol());
 				FULLDECK.add(card);
 			}
 		}

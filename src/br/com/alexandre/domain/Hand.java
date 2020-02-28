@@ -8,23 +8,20 @@ public class Hand {
 	private Long id;
 	private List<HandPlayer> handPlayers = new ArrayList<>();
 	private List<Round> rounds = new ArrayList<>();
-	private List<HandPlayer> winners;
 	private List<HandCard> handCards = new ArrayList<>();
 	private Deck deck;
 	
-	public Hand(Long id, List<HandPlayer> handPlayers, List<Round> rounds, List<HandPlayer> winners,
-			List<HandCard> handCards, Deck deck) {
+	public Hand(Long id, List<HandPlayer> handPlayers, List<Round> rounds, List<HandCard> handCards, Deck deck) {
 		super();
 		this.id = id;
 		this.handPlayers = handPlayers;
 		this.rounds = rounds;
-		this.winners = winners;
 		this.handCards = handCards;
 		this.deck = deck;
 	}
 	
 	public Hand(Long id, Deck deck) {
-		this(id, null, null, null, null, deck);
+		this(id, new ArrayList<HandPlayer>(), new ArrayList<Round>(), new ArrayList<HandCard>(), deck);
 	}
 
 	public Long getId() {
@@ -49,14 +46,6 @@ public class Hand {
 
 	public void setRounds(List<Round> rounds) {
 		this.rounds = rounds;
-	}
-
-	public List<HandPlayer> getWinners() {
-		return winners;
-	}
-
-	public void setWinners(List<HandPlayer> winners) {
-		this.winners = winners;
 	}
 
 	public List<HandCard> getHandCards() {
