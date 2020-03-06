@@ -2,19 +2,20 @@ package br.com.alexandre.service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 import br.com.alexandre.domain.Card;
-import br.com.alexandre.domain.CardCount;
 import br.com.alexandre.domain.Deck;
 import br.com.alexandre.domain.Hand;
 import br.com.alexandre.domain.HandCard;
 import br.com.alexandre.domain.HandPlayer;
+import br.com.alexandre.domain.HandRanking;
 import br.com.alexandre.domain.Person;
 import br.com.alexandre.domain.Player;
 import br.com.alexandre.domain.Round;
@@ -38,7 +39,7 @@ public class Game {
 			hand.setRounds(runRounds(hand));
 			table.getHands().add(hand);
 			//showCards(hand);
-			table.setGameOver(true);
+			//table.setGameOver(true);
 		}
 	}
 	
@@ -140,27 +141,101 @@ public class Game {
 	}
 	
 	public int applyRuleToWinners(List<Card> playerHand){
-		List<Integer> rankNumber = new ArrayList<>();
+		
+		HandRanking handRanking = new HandRanking();
+		
+		/* 
+		 * Apply the rules to count ranks and suits with the same value 
+		 */
+		List<Integer> rankNumbers = new ArrayList<Integer>();
 		StringBuilder suitChar = new StringBuilder();
-		StringBuilder rankChar = new StringBuilder();
+		String flush = "";
 		HashMap<String, Long> suitCount = new HashMap<String, Long>();
 		HashMap<String, Long> rankCount = new HashMap<String, Long>();
 		for(Card card : playerHand) {
-			rankNumber.add(card.getRank());
+			rankNumbers.add(card.getRank());
 			suitChar.append(card.getSuit());
-			rankChar.append(card.getRank());
 		}
+		Collections.sort(rankNumbers, Collections.reverseOrder());
 		for(SuitsEnum suit : SuitsEnum.values()) {
-			suitCount.put(suit.getValue(), rankChar.toString().chars().filter(ch -> ch == suit.getValue().charAt(0)).count());
+			suitCount.put(suit.getValue(), suitChar.chars().filter(ch -> ch == suit.getValue().charAt(0)).count());
 		}
 		suitCount = Util.sortByValue(suitCount);
 		for(RankEnum rank : RankEnum.values()) {
-			rankCount.put(rank.getValue().toString(), rankChar.toString().chars().filter(ch -> ch == rank.getValue()).count());
+			rankCount.put(rank.getValue().toString(), rankNumbers.stream().filter(ch -> ch == rank.getValue()).count());
 		}
 		rankCount = Util.sortByValue(rankCount);
 		
+		/*
+		 * Apply the rules to find flush
+		 */
+		if(suitCount.entrySet().stream().findFirst().get().getValue() >= 5)
+			flush = suitCount.entrySet().stream().findFirst().get().getKey();
+		
+		/*
+		 * Apply the rules to find straight
+		 */
+		Set<Integer> straightNumbers = new LinkedHashSet<Integer>();
+		List<Integer> straightSequence = new ArrayList<Integer>();
+		if(rankNumbers.contains(1)) {
+			straightNumbers.add(14);
+		}
+		straightNumbers.addAll(rankNumbers);
+		if(straightNumbers.size() >= 5) {
+			straightSequence = orderedWithNoGap(straightNumbers);
+		}
+		
+		/*
+		 * Apply the rules to find straight flush
+		 */
+		if(straightSequence.size() == 5 && !flush.isEmpty()) {
+			List<Card> straightCards = new ArrayList<Card>();
+			Set<String> straightFlush = new HashSet<String>();
+			if(straightSequence.contains(14)) {
+				straightSequence.remove(0);
+				straightSequence.add(0, 1);
+			}
+			for(Integer straightItem : straightSequence) {
+				for(Card card : playerHand) {
+					if(card.getRank() == straightItem) {
+						straightCards.add(card);
+						straightFlush.add(card.getSuit());
+					}
+				}
+			}
+			
+			if(straightFlush.size() == 1) {
+				System.out.println("Straight Flush!!!");
+			}
+		}
+
 		return 0;
 	}
+	
+    private List<Integer> orderedWithNoGap(Set<Integer> list) {       
+        Integer prev = null;
+        int seq = 0;
+        List<Integer> straight = new ArrayList<Integer>();
+        for(Integer i : list) {
+            if(prev != null && prev-1 == i) {
+                if(seq == 0) {
+                	seq = 2;
+                	straight.add(i);
+                	straight.add(0, prev);
+                }else {
+                	seq++;
+                	straight.add(i);
+                }
+            }else {
+            	seq = 0;
+            	straight.clear();
+            }
+            if(seq == 5)
+            	return straight;
+            prev = i;
+        }
+        return straight;
+    }
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub

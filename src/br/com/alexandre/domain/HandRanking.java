@@ -1,6 +1,6 @@
 package br.com.alexandre.domain;
 
-public class HandRankings {
+public class HandRanking {
 
 	private Boolean royalFlush;
 	private Boolean straightFlush;
@@ -13,7 +13,7 @@ public class HandRankings {
 	private Boolean onePair;
 	private Boolean highCard;
 	
-	public HandRankings() {
+	public HandRanking() {
 		
 	}
 
