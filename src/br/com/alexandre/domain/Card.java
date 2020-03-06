@@ -5,16 +5,18 @@ public class Card {
 	private int rank;
 	private String suit;
 	private String symbol;
+	private String character;
 	
 	public Card() {
 		
 	}
 
-	public Card(String suit, int rank, String symbol) {
+	public Card(String suit, int rank, String symbol, String character) {
 		super();
 		this.suit = suit;
 		this.rank = rank;
 		this.symbol = symbol;
+		this.character = character;
 	}
 
 	public String getSuit() {
@@ -39,6 +41,14 @@ public class Card {
 
 	public void setSymbol(String symbol) {
 		this.symbol = symbol;
+	}
+	
+	public String getCharacter() {
+		return character;
+	}
+
+	public void setCharacter(String character) {
+		this.character = character;
 	}
 
 	@Override

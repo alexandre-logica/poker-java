@@ -19,6 +19,7 @@ public class Deck {
 			for(RankEnum rank : RankEnum.values()) {
 				card = new Card();
 				card.setRank(rank.getValue());
+				card.setCharacter(rank.getCharacter());
 				card.setSuit(suit.getValue());
 				card.setSymbol(suit.getSymbol());
 				FULLDECK.add(card);
