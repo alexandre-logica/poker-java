@@ -183,14 +183,14 @@ public class Game {
 
 		for(Integer straightItem : straightSequence) {
 			for(Card card : playerHand) {
-				if(card.getRank() == straightItem) {
+				if(card.getRank().equals(straightItem)) {
 					straightCards.add(card);
 					straightFlush.add(card.getSuit());
 				}
 			}
 		}
 		if(straightFlush.size() == 1) {
-			if(straightCards.get(0).getRank() == 1) {
+			if(straightCards.get(0).getRank().equals(1)) {
 				handRanking.setType(ScoreHandEnum.ROYAL_FLUSH.name());
 				handRanking.setValue(ScoreHandEnum.ROYAL_FLUSH.getValue());
 				handRanking.setHandCards(straightCards);
@@ -207,12 +207,28 @@ public class Game {
 		return handRanking;
 	}
 	
+	private List<Card> getCardsByRank(Integer rank, List<Card> playerHand){
+		List<Card> amontCards = new ArrayList<Card>();
+		for(Card card : playerHand) {
+			if(card.getRank().equals(rank)) {
+				amontCards.add(card);
+			}
+		}
+		return amontCards;
+	}
+	
 	private HandRanking checkAmontOfKind(List<Card> playerHand, Map<String, Long> rankCount, List<Integer> ranks) {
-		List<Card> amontCards = new ArrayList<Card>(); 
+		HandRanking handRanking = new HandRanking();
 		for (Map.Entry<String, Long> entry : rankCount.entrySet()) {
-			for(Card card : playerHand) {
+			if(entry.getValue().equals(4L)) {
+				handRanking.setType(ScoreHandEnum.FOUR_OF_KIND.name());
+				handRanking.setValue(ScoreHandEnum.FOUR_OF_KIND.getValue());
+				handRanking.setHandCards(getCardsByRank(new Integer(entry.getKey()), playerHand));
+				return handRanking;
+			}else if(entry.getValue().equals(3L)) {
 				
 			}
+
 		}
 		return new HandRanking();
 	}

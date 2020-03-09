@@ -2,7 +2,7 @@ package br.com.alexandre.domain;
 
 public class Card {
 
-	private int rank;
+	private Integer rank;
 	private String suit;
 	private String symbol;
 	private String character;
@@ -11,7 +11,7 @@ public class Card {
 		
 	}
 
-	public Card(String suit, int rank, String symbol, String character) {
+	public Card(String suit, Integer rank, String symbol, String character) {
 		super();
 		this.suit = suit;
 		this.rank = rank;
@@ -27,11 +27,11 @@ public class Card {
 		this.suit = suit;
 	}
 
-	public int getRank() {
+	public Integer getRank() {
 		return rank;
 	}
 
-	public void setRank(int rank) {
+	public void setRank(Integer rank) {
 		this.rank = rank;
 	}
 	
