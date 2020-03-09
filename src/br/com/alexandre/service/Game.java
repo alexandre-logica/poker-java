@@ -5,8 +5,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
@@ -23,6 +25,7 @@ import br.com.alexandre.domain.Table;
 import br.com.alexandre.domain.TablePlayer;
 import br.com.alexandre.domain.aux.GenderEnum;
 import br.com.alexandre.domain.aux.RankEnum;
+import br.com.alexandre.domain.aux.ScoreHandEnum;
 import br.com.alexandre.domain.aux.SuitsEnum;
 import br.com.alexandre.domain.aux.TypeCardEnum;
 import br.com.alexandre.util.Util;
@@ -140,103 +143,103 @@ public class Game {
 		return new ArrayList<Round>();
 	}
 	
-	public int applyRuleToWinners(List<Card> playerHand){
-		
-		HandRanking handRanking = new HandRanking();
-		
-		/* 
-		 * Apply the rules to count ranks and suits with the same value 
-		 */
-		List<Integer> rankNumbers = new ArrayList<Integer>();
-		StringBuilder suitChar = new StringBuilder();
-		String flush = "";
-		HashMap<String, Long> suitCount = new HashMap<String, Long>();
-		HashMap<String, Long> rankCount = new HashMap<String, Long>();
+	private void countRanksAndSuits(List<Integer> ranks, Map<String, Long> suitCount, Map<String, Long> rankCount, List<Card> playerHand) {
+		List<String> suits = new ArrayList<>();
 		for(Card card : playerHand) {
-			rankNumbers.add(card.getRank());
-			suitChar.append(card.getSuit());
+			ranks.add(card.getRank());
+			suits.add(card.getSuit());
 		}
-		Collections.sort(rankNumbers, Collections.reverseOrder());
+		Collections.sort(ranks, Collections.reverseOrder());
 		for(SuitsEnum suit : SuitsEnum.values()) {
-			suitCount.put(suit.getValue(), suitChar.chars().filter(ch -> ch == suit.getValue().charAt(0)).count());
+			suitCount.put(suit.name(), suits.stream().filter(item -> item == suit.getValue()).count());
 		}
 		suitCount = Util.sortByValue(suitCount);
 		for(RankEnum rank : RankEnum.values()) {
-			rankCount.put(rank.getValue().toString(), rankNumbers.stream().filter(ch -> ch == rank.getValue()).count());
+			rankCount.put(rank.name(), ranks.stream().filter(item -> item == rank.getValue()).count());
 		}
 		rankCount = Util.sortByValue(rankCount);
-		
-		/*
-		 * Apply the rules to find flush
-		 */
-		if(suitCount.entrySet().stream().findFirst().get().getValue() >= 5)
-			flush = suitCount.entrySet().stream().findFirst().get().getKey();
-		
-		/*
-		 * Apply the rules to find straight
-		 */
-		Set<Integer> straightNumbers = new LinkedHashSet<Integer>();
-		List<Integer> straightSequence = new ArrayList<Integer>();
-		if(rankNumbers.contains(1)) {
-			straightNumbers.add(14);
-		}
-		straightNumbers.addAll(rankNumbers);
-		if(straightNumbers.size() >= 5) {
-			straightSequence = orderedWithNoGap(straightNumbers);
-		}
-		
-		/*
-		 * Apply the rules to find straight flush
-		 */
-		if(straightSequence.size() == 5 && !flush.isEmpty()) {
-			List<Card> straightCards = new ArrayList<Card>();
-			Set<String> straightFlush = new HashSet<String>();
-			if(straightSequence.contains(14)) {
-				straightSequence.remove(0);
-				straightSequence.add(0, 1);
-			}
-			for(Integer straightItem : straightSequence) {
-				for(Card card : playerHand) {
-					if(card.getRank() == straightItem) {
-						straightCards.add(card);
-						straightFlush.add(card.getSuit());
-					}
-				}
-			}
-			
-			if(straightFlush.size() == 1) {
-				System.out.println("Straight Flush!!!");
-			}
-		}
-
-		return 0;
 	}
 	
-    private List<Integer> orderedWithNoGap(Set<Integer> list) {       
-        Integer prev = null;
-        int seq = 0;
-        List<Integer> straight = new ArrayList<Integer>();
-        for(Integer i : list) {
-            if(prev != null && prev-1 == i) {
-                if(seq == 0) {
-                	seq = 2;
-                	straight.add(i);
-                	straight.add(0, prev);
-                }else {
-                	seq++;
-                	straight.add(i);
-                }
-            }else {
-            	seq = 0;
-            	straight.clear();
-            }
-            if(seq == 5)
-            	return straight;
-            prev = i;
-        }
-        return straight;
-    }
+	private Boolean checkStraights(List<Integer> ranks, List<Integer> straightSequence) {
+		Set<Integer> straightNumbers = new LinkedHashSet<Integer>();
+		if(ranks.contains(1))
+			straightNumbers.add(14);
+		straightNumbers.addAll(ranks);
+		straightSequence = Util.orderedWithNoGap(straightNumbers);
+		if(straightSequence.contains(14)) {
+			straightSequence.remove(0);
+			straightSequence.add(0, 1);
+		}
+		if(straightSequence.size() == 5)
+			return true;
+		else
+			return false;
+	}
+	
+	private HandRanking checkTypeOfStraight(List<Integer> straightSequence, List<Card> playerHand) {
+		List<Card> straightCards = new ArrayList<Card>();
+		Set<String> straightFlush = new HashSet<String>();
+		HandRanking handRanking = new HandRanking();
 
+		for(Integer straightItem : straightSequence) {
+			for(Card card : playerHand) {
+				if(card.getRank() == straightItem) {
+					straightCards.add(card);
+					straightFlush.add(card.getSuit());
+				}
+			}
+		}
+		if(straightFlush.size() == 1) {
+			if(straightCards.get(0).getRank() == 1) {
+				handRanking.setType(ScoreHandEnum.ROYAL_FLUSH.name());
+				handRanking.setValue(ScoreHandEnum.ROYAL_FLUSH.getValue());
+				handRanking.setHandCards(straightCards);
+			}else {
+				handRanking.setType(ScoreHandEnum.STRAIGHT_FLUSH.name());
+				handRanking.setValue(ScoreHandEnum.STRAIGHT_FLUSH.getValue()+new Double("0."+straightSequence.get(1)));
+				handRanking.setHandCards(straightCards);
+			}
+		}else {
+			handRanking.setType(ScoreHandEnum.STRAIGHT.name());
+			handRanking.setValue(ScoreHandEnum.STRAIGHT.getValue()+new Double("0."+straightSequence.get(1)));
+			handRanking.setHandCards(straightCards);
+		}
+		return handRanking;
+	}
+	
+	private HandRanking checkAmontOfKind(List<Card> playerHand, Map<String, Long> rankCount, List<Integer> ranks) {
+		List<Card> amontCards = new ArrayList<Card>(); 
+		for (Map.Entry<String, Long> entry : rankCount.entrySet()) {
+			for(Card card : playerHand) {
+				
+			}
+		}
+		return new HandRanking();
+	}
+	
+	public List<HandRanking> applyRuleToWinners(List<Card> playerHand){
+		List<HandRanking> ranking = new ArrayList<>();
+		List<Integer> ranks = new ArrayList<Integer>();
+		Map<String, Long> suitCount = new LinkedHashMap<String, Long>();
+		Map<String, Long> rankCount = new LinkedHashMap<String, Long>();
+		List<Integer> straightSequence = new ArrayList<Integer>();
+		/* 
+		 * Apply the rules to count ranks and suits with the same value 
+		 */
+		countRanksAndSuits(ranks, suitCount, rankCount, playerHand);
+		/*
+		 * Apply the rules to check straight, straightFlush and Royal Flush
+		 */
+		if(checkStraights(ranks, straightSequence)) {
+			ranking.add(checkTypeOfStraight(straightSequence, playerHand));
+			if(!ranking.get(0).getType().equals(ScoreHandEnum.STRAIGHT.name())) {
+				return ranking;
+			}
+		}
+
+		return ranking;
+	}
+	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		
