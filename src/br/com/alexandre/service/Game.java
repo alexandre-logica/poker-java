@@ -3,7 +3,6 @@ package br.com.alexandre.service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -207,31 +206,146 @@ public class Game {
 		return handRanking;
 	}
 	
-	private List<Card> getCardsByRank(Integer rank, List<Card> playerHand){
+	private List<Card> getCardsByRank(Integer rank, List<Card> playerHand, List<Integer> ranks, String type){
 		List<Card> amontCards = new ArrayList<Card>();
 		for(Card card : playerHand) {
 			if(card.getRank().equals(rank)) {
 				amontCards.add(card);
 			}
 		}
+		/*
+		 * Add kicker if necessary
+		 */
+		switch (type) {
+		case "ONE_PAIR" :
+			amontCards.add(getKicker((!rank.equals(ranks.get(0)) ? ranks.get(0) : ranks.get(1)), playerHand));
+		case "THREE_OF_KIND" :
+			amontCards.add(getKicker((!rank.equals(ranks.get(0)) ? ranks.get(0) : ranks.get(1)), playerHand));
+		case "FULL_HOUSE" :
+			
+			break;
+
+		default:
+			break;
+		}
+		
 		return amontCards;
 	}
 	
-	private HandRanking checkAmontOfKind(List<Card> playerHand, Map<String, Long> rankCount, List<Integer> ranks) {
-		HandRanking handRanking = new HandRanking();
-		for (Map.Entry<String, Long> entry : rankCount.entrySet()) {
-			if(entry.getValue().equals(4L)) {
-				handRanking.setType(ScoreHandEnum.FOUR_OF_KIND.name());
-				handRanking.setValue(ScoreHandEnum.FOUR_OF_KIND.getValue());
-				handRanking.setHandCards(getCardsByRank(new Integer(entry.getKey()), playerHand));
-				return handRanking;
-			}else if(entry.getValue().equals(3L)) {
-				
+	private Card getKicker(Integer kicker, List<Card> playerHand) {
+		Card kickerCard = new Card();
+		for(Card card : playerHand) {
+			if(card.getRank().equals(kicker)) {
+				kickerCard = card;
 			}
-
 		}
+		return kickerCard;
+	}
+	
+	private HandRanking checkAmountOfKind(List<Card> playerHand, Map<String, Long> rankCount, List<Integer> ranks) {
+		List<HandRanking> ranking = new ArrayList<HandRanking>();
+		List<HandRanking> pairs = new ArrayList<HandRanking>();
+		// verify FOUR_OF_KIND
+		if(checkFourOfKind(playerHand, rankCount, ranks, ranking)) {
+			return ranking.get(0);
+		}else {
+			// verify TWO_PAIR
+		}	
 		return new HandRanking();
 	}
+	
+	private Boolean checkFourOfKind(List<Card> playerHand, Map<String, Long> rankCount, List<Integer> ranks, List<HandRanking> ranking) {
+		Boolean found = false;
+		for (Map.Entry<String, Long> entry : rankCount.entrySet()) {
+			if(entry.getValue().equals(4L)) {
+				// set FOUR_OF_KIND
+				HandRanking handRanking = new HandRanking();
+				handRanking.setType(ScoreHandEnum.FOUR_OF_KIND.name());
+				handRanking.setValue(ScoreHandEnum.FOUR_OF_KIND.getValue());
+				handRanking.setHandCards(getCardsByRank(new Integer(entry.getKey()), playerHand, ranks, ScoreHandEnum.FOUR_OF_KIND.name()));
+				ranking.add(handRanking);
+				found = true;
+			}
+		}
+		return found;
+	}
+	
+	private List<HandRanking> checkPairs(List<Card> playerHand, Map<String, Long> rankCount, List<Integer> ranks, List<HandRanking> ranking) {
+		List<HandRanking> pairs = new ArrayList<HandRanking>();
+		for (Map.Entry<String, Long> entry : rankCount.entrySet()) {
+			if(entry.getValue().equals(2L)) {
+				// set Pairs
+				HandRanking handRanking = new HandRanking();
+				handRanking.setType(ScoreHandEnum.ONE_PAIR.name());
+				handRanking.setValue(ScoreHandEnum.ONE_PAIR.getValue());
+				handRanking.setHandCards(getCardsByRank(new Integer(entry.getKey()), playerHand, ranks, ScoreHandEnum.ONE_PAIR.name()));
+				pairs.add(handRanking);
+			}
+		}
+		return new ArrayList<HandRanking>();
+	}
+			
+			
+//			if(entry.getValue().equals(4L)) {
+//				// set FOUR_OF_KIND
+//				handRanking = new HandRanking();
+//				handRanking.setType(ScoreHandEnum.FOUR_OF_KIND.name());
+//				handRanking.setValue(ScoreHandEnum.FOUR_OF_KIND.getValue());
+//				handRanking.setHandCards(getCardsByRank(new Integer(entry.getKey()), playerHand, ranks, ScoreHandEnum.FULL_HOUSE.name()));
+//				handRankings.add(handRanking);
+//				scoreHands.add(ScoreHandEnum.FOUR_OF_KIND.name());
+//			}else if(entry.getValue().equals(3L)) {
+//				if(scoreHands.contains(ScoreHandEnum.THREE_OF_KIND.name())) {
+//					// set FULL_HOUSE
+//					handRanking = new HandRanking();
+//					handRanking.setType(ScoreHandEnum.FULL_HOUSE.name());
+//					handRanking.setValue(ScoreHandEnum.FULL_HOUSE.getValue());
+//					if(handRankings.get(0).getHandCards().get(0).getRank() > new Integer(entry.getKey())) {
+//						handRanking.setHandCards(handRankings.get(0).getHandCards());
+//						handRanking.getHandCards().addAll((getCardsByRank(new Integer(entry.getKey()), playerHand, ranks, ScoreHandEnum.FULL_HOUSE.name())));
+//						handRanking.getHandCards().remove(handRanking.getHandCards().size()-1);
+//					}else {
+//						handRanking.setHandCards(getCardsByRank(new Integer(entry.getKey()), playerHand, ranks, ScoreHandEnum.FULL_HOUSE.name()));
+//						handRanking.getHandCards().addAll(handRankings.get(0).getHandCards());
+//						handRanking.getHandCards().remove(handRanking.getHandCards().size()-1);
+//					}
+//					handRankings.add(handRanking);
+//					scoreHands.add(ScoreHandEnum.FULL_HOUSE.name());
+//				}else {
+//					// set THREE_OF_KIND
+//					handRanking = new HandRanking();
+//					handRanking.setType(ScoreHandEnum.THREE_OF_KIND.name());
+//					handRanking.setValue(ScoreHandEnum.THREE_OF_KIND.getValue());
+//					handRanking.setHandCards(getCardsByRank(new Integer(entry.getKey()), playerHand, ranks, ScoreHandEnum.THREE_OF_KIND.name()));
+//					handRankings.add(handRanking);
+//					scoreHands.add(ScoreHandEnum.THREE_OF_KIND.name());
+//				}
+//			}else if(entry.getValue().equals(2L)) {
+//				if(scoreHands.contains(ScoreHandEnum.THREE_OF_KIND.name())) {
+//					if(scoreHands.contains(ScoreHandEnum.ONE_PAIR.name())) {
+//						// set FULL_HOUSE
+//						handRanking = new HandRanking();
+//						handRanking.setType(ScoreHandEnum.FULL_HOUSE.name());
+//						handRanking.setValue(ScoreHandEnum.FULL_HOUSE.getValue());
+//						if(handRankings.get(0).getHandCards().get(0).getRank() > new Integer(entry.getKey())) {
+//							handRanking.setHandCards(handRankings.get(0).getHandCards());
+//							handRanking.getHandCards().addAll((getCardsByRank(new Integer(entry.getKey()), playerHand, ranks, ScoreHandEnum.FULL_HOUSE.name())));
+//							handRanking.getHandCards().remove(handRanking.getHandCards().size()-1);
+//						}else {
+//							handRanking.setHandCards(getCardsByRank(new Integer(entry.getKey()), playerHand, ranks, ScoreHandEnum.FULL_HOUSE.name()));
+//							handRanking.getHandCards().addAll(handRankings.get(0).getHandCards());
+//							handRanking.getHandCards().remove(handRanking.getHandCards().size()-1);
+//						}
+//						handRankings.add(handRanking);
+//						scoreHands.add(ScoreHandEnum.FULL_HOUSE.name());
+//					}
+//
+//				}
+//			}
+//
+//	
+//		return new HandRanking();
+//	}
 	
 	public List<HandRanking> applyRuleToWinners(List<Card> playerHand){
 		List<HandRanking> ranking = new ArrayList<>();
@@ -252,6 +366,9 @@ public class Game {
 				return ranking;
 			}
 		}
+		/*
+		 * Apply the rules to check Four of Kind
+		 */
 
 		return ranking;
 	}
