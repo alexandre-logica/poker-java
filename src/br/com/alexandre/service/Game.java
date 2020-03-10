@@ -3,6 +3,7 @@ package br.com.alexandre.service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import br.com.alexandre.domain.Card;
 import br.com.alexandre.domain.Deck;
@@ -23,6 +25,7 @@ import br.com.alexandre.domain.Round;
 import br.com.alexandre.domain.Table;
 import br.com.alexandre.domain.TablePlayer;
 import br.com.alexandre.domain.aux.GenderEnum;
+import br.com.alexandre.domain.aux.LevelValueEnum;
 import br.com.alexandre.domain.aux.RankEnum;
 import br.com.alexandre.domain.aux.ScoreHandEnum;
 import br.com.alexandre.domain.aux.SuitsEnum;
@@ -142,7 +145,7 @@ public class Game {
 		return new ArrayList<Round>();
 	}
 	
-	private void countRanksAndSuits(List<Integer> ranks, Map<String, Long> suitCount, Map<String, Long> rankCount, List<Card> playerHand) {
+	private void countRanksAndSuits(List<Integer> ranks, Map<String, Long> suitCount, Map<Integer, Long> rankCount, List<Card> playerHand) {
 		List<String> suits = new ArrayList<>();
 		for(Card card : playerHand) {
 			ranks.add(card.getRank());
@@ -150,13 +153,17 @@ public class Game {
 		}
 		Collections.sort(ranks, Collections.reverseOrder());
 		for(SuitsEnum suit : SuitsEnum.values()) {
-			suitCount.put(suit.name(), suits.stream().filter(item -> item == suit.getValue()).count());
+			suitCount.put(suit.getValue(), suits.stream().filter(item -> item == suit.getValue()).count());
 		}
-		suitCount = Util.sortByValue(suitCount);
+		//sort by value
+		suitCount = suitCount.entrySet().stream().sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
+				 			 .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue(), (e1, e2) -> e2,LinkedHashMap::new));
 		for(RankEnum rank : RankEnum.values()) {
-			rankCount.put(rank.name(), ranks.stream().filter(item -> item == rank.getValue()).count());
+			rankCount.put(rank.getValue(), ranks.stream().filter(item -> item == rank.getValue()).count());
 		}
-		rankCount = Util.sortByValue(rankCount);
+		//sort by value
+		rankCount = rankCount.entrySet().stream().sorted(Map.Entry.comparingByValue())
+	 			 			 .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue(), (e1, e2) -> e2,LinkedHashMap::new));
 	}
 	
 	private Boolean checkStraights(List<Integer> ranks, List<Integer> straightSequence) {
@@ -206,31 +213,32 @@ public class Game {
 		return handRanking;
 	}
 	
-	private List<Card> getCardsByRank(Integer rank, List<Card> playerHand, List<Integer> ranks, String type){
+	private List<Card> getCardsByRank(Integer rank, List<Card> playerHand){
 		List<Card> amontCards = new ArrayList<Card>();
 		for(Card card : playerHand) {
 			if(card.getRank().equals(rank)) {
 				amontCards.add(card);
 			}
 		}
-		/*
-		 * Add kicker if necessary
-		 */
-		switch (type) {
-		case "ONE_PAIR" :
-			amontCards.add(getKicker((!rank.equals(ranks.get(0)) ? ranks.get(0) : ranks.get(1)), playerHand));
-		case "THREE_OF_KIND" :
-			amontCards.add(getKicker((!rank.equals(ranks.get(0)) ? ranks.get(0) : ranks.get(1)), playerHand));
-		case "FULL_HOUSE" :
-			
-			break;
-
-		default:
-			break;
-		}
-		
 		return amontCards;
 	}
+	
+	/*
+	 * Add kicker if necessary
+	 *
+	switch (type) {
+	case "ONE_PAIR" :
+		amontCards.add(getKicker((!rank.equals(ranks.get(0)) ? ranks.get(0) : ranks.get(1)), playerHand));
+	case "THREE_OF_KIND" :
+		amontCards.add(getKicker((!rank.equals(ranks.get(0)) ? ranks.get(0) : ranks.get(1)), playerHand));
+	case "FULL_HOUSE" :
+		
+		break;
+
+	default:
+		break;
+	}
+	*/
 	
 	private Card getKicker(Integer kicker, List<Card> playerHand) {
 		Card kickerCard = new Card();
@@ -242,50 +250,52 @@ public class Game {
 		return kickerCard;
 	}
 	
-	private HandRanking checkAmountOfKind(List<Card> playerHand, Map<String, Long> rankCount, List<Integer> ranks) {
-		List<HandRanking> ranking = new ArrayList<HandRanking>();
-		List<HandRanking> pairs = new ArrayList<HandRanking>();
-		// verify FOUR_OF_KIND
-		if(checkFourOfKind(playerHand, rankCount, ranks, ranking)) {
-			return ranking.get(0);
-		}else {
-			// verify TWO_PAIR
-		}	
-		return new HandRanking();
-	}
-	
-	private Boolean checkFourOfKind(List<Card> playerHand, Map<String, Long> rankCount, List<Integer> ranks, List<HandRanking> ranking) {
+	private HandRanking checkFourOfKind(List<Card> playerHand, Map<Integer, Long> rankCount, List<Integer> ranks) {
 		Boolean found = false;
-		for (Map.Entry<String, Long> entry : rankCount.entrySet()) {
-			if(entry.getValue().equals(4L)) {
+		List<HandRanking> pairs = new ArrayList<HandRanking>();
+		List<HandRanking> triplets = new ArrayList<HandRanking>();
+		HandRanking fourOfKind;
+		for (Map.Entry<Integer, Long> entry : rankCount.entrySet()) {
+			if(entry.getValue().equals(2L)) {
+				// set ONE_PAIR
+				HandRanking handRanking = new HandRanking();
+				handRanking.setType(ScoreHandEnum.ONE_PAIR.name());
+				handRanking.setHandCards(getCardsByRank(entry.getKey(), playerHand));
+				handRanking.setValue(setValueFirstLevel(entry.getKey(), ScoreHandEnum.ONE_PAIR.name()));
+				pairs.add(handRanking);
+			}else if(entry.getValue().equals(3L)) {
+				// set THREE_OF_KIND
+				HandRanking handRanking = new HandRanking();
+				handRanking.setType(ScoreHandEnum.THREE_OF_KIND.name());
+				handRanking.setHandCards(getCardsByRank(entry.getKey(), playerHand));
+				handRanking.setValue(setValueFirstLevel(entry.getKey(), ScoreHandEnum.THREE_OF_KIND.name()));
+				triplets.add(handRanking);
+			}else if(entry.getValue().equals(4L)) {
 				// set FOUR_OF_KIND
 				HandRanking handRanking = new HandRanking();
 				handRanking.setType(ScoreHandEnum.FOUR_OF_KIND.name());
-				handRanking.setValue(ScoreHandEnum.FOUR_OF_KIND.getValue());
-				handRanking.setHandCards(getCardsByRank(new Integer(entry.getKey()), playerHand, ranks, ScoreHandEnum.FOUR_OF_KIND.name()));
-				ranking.add(handRanking);
-				found = true;
+				handRanking.setHandCards(getCardsByRank(entry.getKey(), playerHand));
+				handRanking.setValue(setValueFirstLevel(entry.getKey(), ScoreHandEnum.FOUR_OF_KIND.name()));
+				fourOfKind = handRanking;
 			}
 		}
-		return found;
+		Collections.sort(pairs, Collections.reverseOrder());
+		return new HandRanking();
 	}
 	
-	private List<HandRanking> checkPairs(List<Card> playerHand, Map<String, Long> rankCount, List<Integer> ranks, List<HandRanking> ranking) {
-		List<HandRanking> pairs = new ArrayList<HandRanking>();
-		for (Map.Entry<String, Long> entry : rankCount.entrySet()) {
-			if(entry.getValue().equals(2L)) {
-				// set Pairs
-				HandRanking handRanking = new HandRanking();
-				handRanking.setType(ScoreHandEnum.ONE_PAIR.name());
-				handRanking.setValue(ScoreHandEnum.ONE_PAIR.getValue());
-				handRanking.setHandCards(getCardsByRank(new Integer(entry.getKey()), playerHand, ranks, ScoreHandEnum.ONE_PAIR.name()));
-				pairs.add(handRanking);
-			}
+	private Double setValueFirstLevel(Integer rank, String typeHand) {
+		Double value = 0.0;
+		switch (typeHand) {
+		case "ONE_PAIR" :
+			value = ScoreHandEnum.ONE_PAIR.getValue()+(rank*LevelValueEnum.LEVEL_ONE.getValue());
+			break;
+
+		default:
+			break;
 		}
-		return new ArrayList<HandRanking>();
+		return value;
 	}
-			
-			
+	
 //			if(entry.getValue().equals(4L)) {
 //				// set FOUR_OF_KIND
 //				handRanking = new HandRanking();
@@ -350,8 +360,8 @@ public class Game {
 	public List<HandRanking> applyRuleToWinners(List<Card> playerHand){
 		List<HandRanking> ranking = new ArrayList<>();
 		List<Integer> ranks = new ArrayList<Integer>();
-		Map<String, Long> suitCount = new LinkedHashMap<String, Long>();
-		Map<String, Long> rankCount = new LinkedHashMap<String, Long>();
+		Map<String, Long> suitCount = new HashMap<String, Long>();
+		Map<Integer, Long> rankCount = new HashMap<Integer, Long>();
 		List<Integer> straightSequence = new ArrayList<Integer>();
 		/* 
 		 * Apply the rules to count ranks and suits with the same value 

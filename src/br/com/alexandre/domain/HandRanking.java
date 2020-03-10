@@ -2,11 +2,12 @@ package br.com.alexandre.domain;
 
 import java.util.List;
 
-public class HandRanking {
+public class HandRanking implements Comparable<HandRanking>{
 
 	private String type;
 	private Double value;
 	private List<Card> handCards;
+	private List<Integer> kickers;
 	
 	public HandRanking() {
 		
@@ -36,4 +37,21 @@ public class HandRanking {
 		this.handCards = handCards;
 	}
 	
+	public List<Integer> getKickers() {
+		return kickers;
+	}
+
+	public void setKickers(List<Integer> kickers) {
+		this.kickers = kickers;
+	}
+
+	@Override
+	public String toString() {
+		return "HandRanking [type=" + type + ", value=" + value + "]";
+	}
+	
+	@Override
+	public int compareTo(HandRanking o) {
+		return this.getValue().compareTo(o.getValue());
+	}
 }
