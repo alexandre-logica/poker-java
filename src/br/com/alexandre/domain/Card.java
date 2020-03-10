@@ -1,6 +1,6 @@
 package br.com.alexandre.domain;
 
-public class Card {
+public class Card implements Comparable<Card>{
 
 	private Integer rank;
 	private String suit;
@@ -54,6 +54,11 @@ public class Card {
 	@Override
 	public String toString() {
 		return "Card [rank=" + rank + ", suit=" + suit + ", symbol=" +symbol + "]";
+	}
+	
+	@Override
+	public int compareTo(Card o) {
+		return this.getRank().compareTo(o.getRank());
 	}
 
 }

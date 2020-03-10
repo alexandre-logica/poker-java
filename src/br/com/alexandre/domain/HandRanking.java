@@ -7,7 +7,7 @@ public class HandRanking implements Comparable<HandRanking>{
 	private String type;
 	private Double value;
 	private List<Card> handCards;
-	private List<Integer> kickers;
+	private List<Card> kickers;
 	
 	public HandRanking() {
 		
@@ -37,11 +37,11 @@ public class HandRanking implements Comparable<HandRanking>{
 		this.handCards = handCards;
 	}
 	
-	public List<Integer> getKickers() {
+	public List<Card> getKickers() {
 		return kickers;
 	}
 
-	public void setKickers(List<Integer> kickers) {
+	public void setKickers(List<Card> kickers) {
 		this.kickers = kickers;
 	}
 

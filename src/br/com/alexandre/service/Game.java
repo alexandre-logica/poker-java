@@ -223,71 +223,157 @@ public class Game {
 		return amontCards;
 	}
 	
-	/*
-	 * Add kicker if necessary
-	 *
-	switch (type) {
-	case "ONE_PAIR" :
-		amontCards.add(getKicker((!rank.equals(ranks.get(0)) ? ranks.get(0) : ranks.get(1)), playerHand));
-	case "THREE_OF_KIND" :
-		amontCards.add(getKicker((!rank.equals(ranks.get(0)) ? ranks.get(0) : ranks.get(1)), playerHand));
-	case "FULL_HOUSE" :
-		
-		break;
-
-	default:
-		break;
-	}
-	*/
-	
-	private Card getKicker(Integer kicker, List<Card> playerHand) {
-		Card kickerCard = new Card();
-		for(Card card : playerHand) {
-			if(card.getRank().equals(kicker)) {
-				kickerCard = card;
+	private List<Card> getKicker(List<Card> playerHand, List<Integer> ranks, List<Card> handCards) {
+		List<Card> kickers = new ArrayList<Card>();
+		for(Integer rank : ranks) {
+			for()
+			if(!handCards.contains(rank)) {
+				for(Card card : playerHand) {
+					if(card.getRank().equals(rank)) {
+						kickers.add(card);
+						if((handCards.size()+kickers.size()) == 5) {
+							return kickers;
+						}
+					}
+				}
 			}
 		}
-		return kickerCard;
+		return kickers;
 	}
 	
-	private HandRanking checkFourOfKind(List<Card> playerHand, Map<Integer, Long> rankCount, List<Integer> ranks) {
-		Boolean found = false;
+	private HandRanking checkAmountOfKind(List<Card> playerHand, Map<Integer, Long> rankCount, List<Integer> ranks) {
 		List<HandRanking> pairs = new ArrayList<HandRanking>();
 		List<HandRanking> triplets = new ArrayList<HandRanking>();
-		HandRanking fourOfKind;
 		for (Map.Entry<Integer, Long> entry : rankCount.entrySet()) {
 			if(entry.getValue().equals(2L)) {
 				// set ONE_PAIR
 				HandRanking handRanking = new HandRanking();
 				handRanking.setType(ScoreHandEnum.ONE_PAIR.name());
 				handRanking.setHandCards(getCardsByRank(entry.getKey(), playerHand));
-				handRanking.setValue(setValueFirstLevel(entry.getKey(), ScoreHandEnum.ONE_PAIR.name()));
+				handRanking.setValue(ScoreHandEnum.ONE_PAIR.getValue()+(entry.getKey()*LevelValueEnum.LEVEL_ONE.getValue()));
 				pairs.add(handRanking);
 			}else if(entry.getValue().equals(3L)) {
 				// set THREE_OF_KIND
 				HandRanking handRanking = new HandRanking();
 				handRanking.setType(ScoreHandEnum.THREE_OF_KIND.name());
 				handRanking.setHandCards(getCardsByRank(entry.getKey(), playerHand));
-				handRanking.setValue(setValueFirstLevel(entry.getKey(), ScoreHandEnum.THREE_OF_KIND.name()));
+				handRanking.setValue(ScoreHandEnum.THREE_OF_KIND.getValue()+(entry.getKey()*LevelValueEnum.LEVEL_ONE.getValue()));
 				triplets.add(handRanking);
 			}else if(entry.getValue().equals(4L)) {
 				// set FOUR_OF_KIND
 				HandRanking handRanking = new HandRanking();
 				handRanking.setType(ScoreHandEnum.FOUR_OF_KIND.name());
 				handRanking.setHandCards(getCardsByRank(entry.getKey(), playerHand));
-				handRanking.setValue(setValueFirstLevel(entry.getKey(), ScoreHandEnum.FOUR_OF_KIND.name()));
-				fourOfKind = handRanking;
+				handRanking.setKickers(getKicker(playerHand, ranks, handRanking.getHandCards()));
+				handRanking.getHandCards().addAll(handRanking.getKickers());
+				handRanking.setValue(setValue(handRanking));
+				return handRanking;
 			}
 		}
-		Collections.sort(pairs, Collections.reverseOrder());
+		if(triplets.size() > 0) {
+			if(triplets.size() == 2) {
+				// set FULL_HOUSE
+				Collections.sort(triplets, Collections.reverseOrder());
+				HandRanking handRanking = new HandRanking();
+				handRanking.setType(ScoreHandEnum.FULL_HOUSE.name());
+				handRanking.setHandCards(triplets.get(0).getHandCards());
+				handRanking.getHandCards().addAll(triplets.get(1).getHandCards());
+				handRanking.getHandCards().remove(handRanking.getHandCards().size()-1);
+				handRanking.setValue(setValue(handRanking));
+				return handRanking;
+			}else if(pairs.size() > 0) {
+				// set FULL_HOUSE
+				Collections.sort(triplets, Collections.reverseOrder());
+				Collections.sort(pairs, Collections.reverseOrder());
+				HandRanking handRanking = new HandRanking();
+				handRanking.setType(ScoreHandEnum.FULL_HOUSE.name());
+				handRanking.setHandCards(triplets.get(0).getHandCards());
+				handRanking.getHandCards().addAll(pairs.get(0).getHandCards());
+				handRanking.setValue(setValue(handRanking));
+				return handRanking;
+			}else {
+				// set THREE_OF_KIND
+				HandRanking handRanking = new HandRanking();
+				handRanking.setType(ScoreHandEnum.THREE_OF_KIND.name());
+				handRanking.setHandCards(triplets.get(0).getHandCards());
+				handRanking.setKickers(getKicker(playerHand, ranks, handRanking.getHandCards()));
+				handRanking.getHandCards().addAll(handRanking.getKickers());
+				handRanking.setValue(setValue(handRanking));
+				return handRanking;
+			}
+		}else if(pairs.size() > 0) {
+			if(pairs.size() >= 2) {
+				Collections.sort(pairs, Collections.reverseOrder());
+				// set TWO_PAIR
+				HandRanking handRanking = new HandRanking();
+				handRanking.setType(ScoreHandEnum.TWO_PAIR.name());
+				handRanking.setHandCards(pairs.get(0).getHandCards());
+				handRanking.getHandCards().addAll(pairs.get(1).getHandCards());
+				handRanking.setKickers(getKicker(playerHand, ranks, handRanking.getHandCards()));
+				handRanking.getHandCards().addAll(handRanking.getKickers());
+				handRanking.setValue(setValue(handRanking));
+				return handRanking;
+			}else {
+				Collections.sort(pairs, Collections.reverseOrder());
+				// set ONE_PAIR
+				HandRanking handRanking = new HandRanking();
+				handRanking.setType(ScoreHandEnum.ONE_PAIR.name());
+				handRanking.setHandCards(pairs.get(0).getHandCards());
+				handRanking.setKickers(getKicker(playerHand, ranks, handRanking.getHandCards()));
+				handRanking.getHandCards().addAll(handRanking.getKickers());
+				handRanking.setValue(setValue(handRanking));
+				return handRanking;
+			}
+		}
+		
 		return new HandRanking();
 	}
 	
-	private Double setValueFirstLevel(Integer rank, String typeHand) {
+	private Double setValueLevels(HandRanking handRanking) {
 		Double value = 0.0;
-		switch (typeHand) {
-		case "ONE_PAIR" :
-			value = ScoreHandEnum.ONE_PAIR.getValue()+(rank*LevelValueEnum.LEVEL_ONE.getValue());
+		List<Card> handCards = handRanking.getHandCards();
+		String type = handRanking.getType();
+		
+		switch (type) {
+		case "ROYAL_FLUSH":
+			value = ScoreHandEnum.ROYAL_FLUSH.getValue();
+			break;
+		case "STRAIGHT_FLUSH":
+			value = ScoreHandEnum.STRAIGHT_FLUSH.getValue();
+			value += (double) handCards.get(0).getRank() * LevelValueEnum.LEVEL_ONE.getValue();
+			break;
+		case "FOUR_OF_KIND":
+			value = ScoreHandEnum.FOUR_OF_KIND.getValue();
+			value += (double) handCards.get(0).getRank() * LevelValueEnum.LEVEL_ONE.getValue();
+			break;
+		case "FULL_HOUSE":
+			value = ScoreHandEnum.FULL_HOUSE.getValue();
+			value += (double) handCards.get(0).getRank() * LevelValueEnum.LEVEL_ONE.getValue();
+            value += (double) handCards.get(handCards.size()-1).getRank() * LevelValueEnum.LEVEL_TWO.getValue();
+			break;
+		case "FLUSH":
+			value = ScoreHandEnum.FLUSH.getValue();
+			value += (double) handCards.get(0).getRank() * LevelValueEnum.LEVEL_ONE.getValue();
+			break;
+		case "STRAIGHT":
+			value = ScoreHandEnum.STRAIGHT.getValue();
+			value += (double) handCards.get(0).getRank() * LevelValueEnum.LEVEL_ONE.getValue();
+			break;
+		case "THREE_OF_KIND":
+			value = ScoreHandEnum.THREE_OF_KIND.getValue();
+			value += (double) handCards.get(0).getRank() * LevelValueEnum.LEVEL_ONE.getValue();
+			break;
+		case "TWO_PAIR":
+			value = ScoreHandEnum.TWO_PAIR.getValue();
+			value += (double) handCards.get(0).getRank() * LevelValueEnum.LEVEL_ONE.getValue();
+            value += (double) handCards.get(handCards.size()-1).getRank() * LevelValueEnum.LEVEL_TWO.getValue();
+			break;
+		case "ONE_PAIR":
+			value = ScoreHandEnum.ONE_PAIR.getValue();
+			value += (double) handCards.get(0).getRank() * LevelValueEnum.LEVEL_ONE.getValue();
+			break;
+		case "HIGH_CARD":
+			value = ScoreHandEnum.HIGH_CARD.getValue();
 			break;
 
 		default:
@@ -296,66 +382,22 @@ public class Game {
 		return value;
 	}
 	
-//			if(entry.getValue().equals(4L)) {
-//				// set FOUR_OF_KIND
-//				handRanking = new HandRanking();
-//				handRanking.setType(ScoreHandEnum.FOUR_OF_KIND.name());
-//				handRanking.setValue(ScoreHandEnum.FOUR_OF_KIND.getValue());
-//				handRanking.setHandCards(getCardsByRank(new Integer(entry.getKey()), playerHand, ranks, ScoreHandEnum.FULL_HOUSE.name()));
-//				handRankings.add(handRanking);
-//				scoreHands.add(ScoreHandEnum.FOUR_OF_KIND.name());
-//			}else if(entry.getValue().equals(3L)) {
-//				if(scoreHands.contains(ScoreHandEnum.THREE_OF_KIND.name())) {
-//					// set FULL_HOUSE
-//					handRanking = new HandRanking();
-//					handRanking.setType(ScoreHandEnum.FULL_HOUSE.name());
-//					handRanking.setValue(ScoreHandEnum.FULL_HOUSE.getValue());
-//					if(handRankings.get(0).getHandCards().get(0).getRank() > new Integer(entry.getKey())) {
-//						handRanking.setHandCards(handRankings.get(0).getHandCards());
-//						handRanking.getHandCards().addAll((getCardsByRank(new Integer(entry.getKey()), playerHand, ranks, ScoreHandEnum.FULL_HOUSE.name())));
-//						handRanking.getHandCards().remove(handRanking.getHandCards().size()-1);
-//					}else {
-//						handRanking.setHandCards(getCardsByRank(new Integer(entry.getKey()), playerHand, ranks, ScoreHandEnum.FULL_HOUSE.name()));
-//						handRanking.getHandCards().addAll(handRankings.get(0).getHandCards());
-//						handRanking.getHandCards().remove(handRanking.getHandCards().size()-1);
-//					}
-//					handRankings.add(handRanking);
-//					scoreHands.add(ScoreHandEnum.FULL_HOUSE.name());
-//				}else {
-//					// set THREE_OF_KIND
-//					handRanking = new HandRanking();
-//					handRanking.setType(ScoreHandEnum.THREE_OF_KIND.name());
-//					handRanking.setValue(ScoreHandEnum.THREE_OF_KIND.getValue());
-//					handRanking.setHandCards(getCardsByRank(new Integer(entry.getKey()), playerHand, ranks, ScoreHandEnum.THREE_OF_KIND.name()));
-//					handRankings.add(handRanking);
-//					scoreHands.add(ScoreHandEnum.THREE_OF_KIND.name());
-//				}
-//			}else if(entry.getValue().equals(2L)) {
-//				if(scoreHands.contains(ScoreHandEnum.THREE_OF_KIND.name())) {
-//					if(scoreHands.contains(ScoreHandEnum.ONE_PAIR.name())) {
-//						// set FULL_HOUSE
-//						handRanking = new HandRanking();
-//						handRanking.setType(ScoreHandEnum.FULL_HOUSE.name());
-//						handRanking.setValue(ScoreHandEnum.FULL_HOUSE.getValue());
-//						if(handRankings.get(0).getHandCards().get(0).getRank() > new Integer(entry.getKey())) {
-//							handRanking.setHandCards(handRankings.get(0).getHandCards());
-//							handRanking.getHandCards().addAll((getCardsByRank(new Integer(entry.getKey()), playerHand, ranks, ScoreHandEnum.FULL_HOUSE.name())));
-//							handRanking.getHandCards().remove(handRanking.getHandCards().size()-1);
-//						}else {
-//							handRanking.setHandCards(getCardsByRank(new Integer(entry.getKey()), playerHand, ranks, ScoreHandEnum.FULL_HOUSE.name()));
-//							handRanking.getHandCards().addAll(handRankings.get(0).getHandCards());
-//							handRanking.getHandCards().remove(handRanking.getHandCards().size()-1);
-//						}
-//						handRankings.add(handRanking);
-//						scoreHands.add(ScoreHandEnum.FULL_HOUSE.name());
-//					}
-//
-//				}
-//			}
-//
-//	
-//		return new HandRanking();
-//	}
+	private Double setValue(HandRanking handRanking) {
+		Double value = 0.0;
+		value = setValueLevels(handRanking)+setValueKickers(handRanking.getKickers());
+		return value;
+	}
+	
+	private Double setValueKickers(List<Card> kickers) {
+		Double value = 0.0;
+		Integer level = LevelValueEnum.LEVEL_FIVE.getValue();
+		Collections.sort(kickers, Collections.reverseOrder());
+		for(Card card : kickers) {
+			value = (double) (card.getRank()*level);
+			level *= 10;
+		}
+		return value;
+	}
 	
 	public List<HandRanking> applyRuleToWinners(List<Card> playerHand){
 		List<HandRanking> ranking = new ArrayList<>();
