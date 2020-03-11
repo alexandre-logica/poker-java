@@ -13,6 +13,8 @@ import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.print.attribute.HashPrintJobAttributeSet;
+
 import br.com.alexandre.domain.Card;
 import br.com.alexandre.domain.Deck;
 import br.com.alexandre.domain.Hand;
@@ -223,27 +225,20 @@ public class Game {
 		return amontCards;
 	}
 	
-	private List<Card> getKicker(List<Card> playerHand, List<Integer> ranks, List<Card> handCards) {
+	private List<Card> getKicker(List<Card> playerHand, List<Card> handCards) {
 		List<Card> kickers = new ArrayList<Card>();
-		for(Integer rank : ranks) {
-			for()
-			if(!handCards.contains(rank)) {
-				for(Card card : playerHand) {
-					if(card.getRank().equals(rank)) {
-						kickers.add(card);
-						if((handCards.size()+kickers.size()) == 5) {
-							return kickers;
-						}
-					}
-				}
-			}
-		}
+		kickers.addAll(playerHand);
+		kickers.removeAll(handCards);
+		Collections.sort(kickers, Collections.reverseOrder());
+		kickers = kickers.subList(0, (5 - handCards.size()));
 		return kickers;
 	}
 	
-	private HandRanking checkAmountOfKind(List<Card> playerHand, Map<Integer, Long> rankCount, List<Integer> ranks) {
+	private Map<String, List<HandRanking>> checkAmountOfKind(List<Card> playerHand, Map<Integer, Long> rankCount) {
 		List<HandRanking> pairs = new ArrayList<HandRanking>();
 		List<HandRanking> triplets = new ArrayList<HandRanking>();
+		List<HandRanking> fours = new ArrayList<HandRanking>();
+		Map<String, List<HandRanking>> amountOfKinds = new HashMap<>();
 		for (Map.Entry<Integer, Long> entry : rankCount.entrySet()) {
 			if(entry.getValue().equals(2L)) {
 				// set ONE_PAIR
@@ -252,6 +247,7 @@ public class Game {
 				handRanking.setHandCards(getCardsByRank(entry.getKey(), playerHand));
 				handRanking.setValue(ScoreHandEnum.ONE_PAIR.getValue()+(entry.getKey()*LevelValueEnum.LEVEL_ONE.getValue()));
 				pairs.add(handRanking);
+				amountOfKinds.put("pairs", pairs);
 			}else if(entry.getValue().equals(3L)) {
 				// set THREE_OF_KIND
 				HandRanking handRanking = new HandRanking();
@@ -259,17 +255,26 @@ public class Game {
 				handRanking.setHandCards(getCardsByRank(entry.getKey(), playerHand));
 				handRanking.setValue(ScoreHandEnum.THREE_OF_KIND.getValue()+(entry.getKey()*LevelValueEnum.LEVEL_ONE.getValue()));
 				triplets.add(handRanking);
+				amountOfKinds.put("triplets", triplets);
 			}else if(entry.getValue().equals(4L)) {
 				// set FOUR_OF_KIND
 				HandRanking handRanking = new HandRanking();
 				handRanking.setType(ScoreHandEnum.FOUR_OF_KIND.name());
 				handRanking.setHandCards(getCardsByRank(entry.getKey(), playerHand));
-				handRanking.setKickers(getKicker(playerHand, ranks, handRanking.getHandCards()));
+				handRanking.setKickers(getKicker(playerHand, handRanking.getHandCards()));
 				handRanking.getHandCards().addAll(handRanking.getKickers());
 				handRanking.setValue(setValue(handRanking));
-				return handRanking;
+				fours.add(handRanking);
+				amountOfKinds.put("fours", fours);
 			}
 		}
+		return amountOfKinds;
+	}
+	
+	private HandRanking setRanking(Map<String, List<HandRanking>> amountOfKinds, List<Card> playerHand) {
+		List<HandRanking> pairs = amountOfKinds.get("pairs");
+		List<HandRanking> triplets = amountOfKinds.get("triplets");
+		List<HandRanking> fours = amountOfKinds.get("fours");
 		if(triplets.size() > 0) {
 			if(triplets.size() == 2) {
 				// set FULL_HOUSE
@@ -296,7 +301,7 @@ public class Game {
 				HandRanking handRanking = new HandRanking();
 				handRanking.setType(ScoreHandEnum.THREE_OF_KIND.name());
 				handRanking.setHandCards(triplets.get(0).getHandCards());
-				handRanking.setKickers(getKicker(playerHand, ranks, handRanking.getHandCards()));
+				handRanking.setKickers(getKicker(playerHand, handRanking.getHandCards()));
 				handRanking.getHandCards().addAll(handRanking.getKickers());
 				handRanking.setValue(setValue(handRanking));
 				return handRanking;
@@ -309,7 +314,7 @@ public class Game {
 				handRanking.setType(ScoreHandEnum.TWO_PAIR.name());
 				handRanking.setHandCards(pairs.get(0).getHandCards());
 				handRanking.getHandCards().addAll(pairs.get(1).getHandCards());
-				handRanking.setKickers(getKicker(playerHand, ranks, handRanking.getHandCards()));
+				handRanking.setKickers(getKicker(playerHand, handRanking.getHandCards()));
 				handRanking.getHandCards().addAll(handRanking.getKickers());
 				handRanking.setValue(setValue(handRanking));
 				return handRanking;
@@ -319,7 +324,7 @@ public class Game {
 				HandRanking handRanking = new HandRanking();
 				handRanking.setType(ScoreHandEnum.ONE_PAIR.name());
 				handRanking.setHandCards(pairs.get(0).getHandCards());
-				handRanking.setKickers(getKicker(playerHand, ranks, handRanking.getHandCards()));
+				handRanking.setKickers(getKicker(playerHand, handRanking.getHandCards()));
 				handRanking.getHandCards().addAll(handRanking.getKickers());
 				handRanking.setValue(setValue(handRanking));
 				return handRanking;
@@ -384,7 +389,9 @@ public class Game {
 	
 	private Double setValue(HandRanking handRanking) {
 		Double value = 0.0;
-		value = setValueLevels(handRanking)+setValueKickers(handRanking.getKickers());
+		value = setValueLevels(handRanking);
+		if(handRanking.getKickers() != null && handRanking.getKickers().size() > 0)
+			value += setValueKickers(handRanking.getKickers());
 		return value;
 	}
 	
