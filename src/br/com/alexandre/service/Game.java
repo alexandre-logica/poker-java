@@ -150,8 +150,11 @@ public class Game {
 		List<Integer> ranks = setRanks(playerHand);
 		Map<Integer, Long> rankCount = new HashMap<Integer, Long>();
 		Collections.sort(ranks, Collections.reverseOrder());
-		for(RankEnum rank : RankEnum.values()) {
-			rankCount.put(rank.getValue(), ranks.stream().filter(item -> item == rank.getValue()).count());
+		for(Integer rank : ranks) {
+			if(rank.equals(14))
+				rankCount.put(1, ranks.stream().filter(item -> item == rank).count());
+			else
+				rankCount.put(rank, ranks.stream().filter(item -> item == rank).count());
 		}
 		//sort by value
 		rankCount = rankCount.entrySet().stream().sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
@@ -162,7 +165,10 @@ public class Game {
 	private List<Integer> setRanks(List<Card> playerHand) {
 		List<Integer> ranks = new ArrayList<Integer>();
 		for(Card card : playerHand) {
-			ranks.add(card.getRank());
+			if(card.getRank() == 1)
+				ranks.add(14);
+			else
+				ranks.add(card.getRank());
 		}
 		return ranks;
 	}
@@ -212,8 +218,8 @@ public class Game {
 	private List<Integer> checkStraights(List<Integer> ranks) {
 		Set<Integer> straightNumbers = new LinkedHashSet<Integer>();
 		List<Integer> straightSequence = new ArrayList<Integer>();
-		if(ranks.contains(1))
-			straightNumbers.add(14);
+		if(ranks.contains(14))
+			straightNumbers.add(1);
 		straightNumbers.addAll(ranks);
 		straightSequence = Util.orderedWithNoGap(straightNumbers);
 		if(straightSequence.contains(14)) {
@@ -249,6 +255,9 @@ public class Game {
 				handRanking.setType(ScoreHandEnum.STRAIGHT.name());
 				handRanking.setHandCards(straightCards);
 			}
+		}
+		else {
+			handRanking = null;
 		}
 		return handRanking;
 	}
@@ -308,46 +317,57 @@ public class Game {
 				}
 			}
 		}
+		if(amountOfKinds.size() == 0)
+			amountOfKinds = null;
 		return amountOfKinds;
 	}
 	
+	@SuppressWarnings("unused")
 	private HandRanking setPlayerScore(List<Card> playerHand) {
+		List<HandRanking> pairs = null;
+		List<HandRanking> triplets = null;
+		List<HandRanking> fours = null;
 		Map<String, List<HandRanking>> amountOfKinds = checkAmountOfKind(playerHand);
-		List<HandRanking> pairs = amountOfKinds.get("pairs");
-		List<HandRanking> triplets = amountOfKinds.get("triplets");
-		List<HandRanking> fours = amountOfKinds.get("fours");
+		if(amountOfKinds != null) {
+			pairs = amountOfKinds.get("pairs");
+			triplets = amountOfKinds.get("triplets");
+			fours = amountOfKinds.get("fours");
+		}
 		HandRanking straightHand = checkTypeOfStraight(playerHand);
-		HandRanking handRanking = new HandRanking();
 		HandRanking flushHand = checkFlush(playerHand);
+		HandRanking tripletHand = null;
+		HandRanking handRanking = null;
 		
-		if(straightHand.getType().equals(ScoreHandEnum.ROYAL_FLUSH.name())) {
+		if(straightHand != null && straightHand.getType().equals(ScoreHandEnum.ROYAL_FLUSH.name())) {
 			// set ROYAL_FLUSH
 			handRanking = straightHand;
 			handRanking.setValue(calcValue(handRanking));
 			return handRanking;
-		}else if(straightHand.getType().equals(ScoreHandEnum.STRAIGHT_FLUSH.name())) {
+		}else if(straightHand != null && straightHand.getType().equals(ScoreHandEnum.STRAIGHT_FLUSH.name())) {
 			// set STRAIGHT_FLUSH
 			handRanking = straightHand;
 			handRanking.setKickers(handRanking.getHandCards());
 			handRanking.setValue(calcValue(handRanking));
 			return handRanking;
-		}else if(fours.size() > 0) {
+		}else if(fours != null && fours.size() > 0) {
 			// set FOUR_OF_KIND
 			return fours.get(0);
-		}else if(triplets.size() > 0) {
+		}else if(triplets != null && triplets.size() > 0) {
 			if(triplets.size() == 2) {
 				// set FULL_HOUSE
 				Collections.sort(triplets, Collections.reverseOrder());
+				handRanking = new HandRanking();
 				handRanking.setType(ScoreHandEnum.FULL_HOUSE.name());
 				handRanking.setHandCards(triplets.get(0).getHandCards());
 				handRanking.getHandCards().addAll(triplets.get(1).getHandCards());
 				handRanking.getHandCards().remove(handRanking.getHandCards().size()-1);
 				handRanking.setValue(calcValue(handRanking));
 				return handRanking;
-			}else if(pairs.size() > 0) {
+			}else if(pairs != null && pairs.size() > 0) {
 				// set FULL_HOUSE
 				Collections.sort(triplets, Collections.reverseOrder());
 				Collections.sort(pairs, Collections.reverseOrder());
+				handRanking = new HandRanking();
 				handRanking.setType(ScoreHandEnum.FULL_HOUSE.name());
 				handRanking.setHandCards(triplets.get(0).getHandCards());
 				handRanking.getHandCards().addAll(pairs.get(0).getHandCards());
@@ -355,11 +375,13 @@ public class Game {
 				return handRanking;
 			}else {
 				// set THREE_OF_KIND
+				handRanking = new HandRanking();
 				handRanking.setType(ScoreHandEnum.THREE_OF_KIND.name());
 				handRanking.setHandCards(triplets.get(0).getHandCards());
 				handRanking.setKickers(getKicker(playerHand, handRanking.getHandCards()));
 				handRanking.getHandCards().addAll(handRanking.getKickers());
 				handRanking.setValue(calcValue(handRanking));
+				tripletHand = handRanking;
 			}
 		}else if(flushHand != null) {
 			// set FLUSH
@@ -367,20 +389,21 @@ public class Game {
 			handRanking.setKickers(handRanking.getHandCards());
 			handRanking.setValue(calcValue(handRanking));
 			return handRanking;
-		}else if(straightHand.getType().equals(ScoreHandEnum.STRAIGHT.name())) {
+		}else if(straightHand != null && straightHand.getType().equals(ScoreHandEnum.STRAIGHT.name())) {
 			// set STRAIGHT
 			handRanking = straightHand;
 			handRanking.setKickers(handRanking.getHandCards());
 			handRanking.setValue(calcValue(handRanking));
 			return handRanking;
-		}else if(handRanking.getType().equals(ScoreHandEnum.THREE_OF_KIND.name())) {
+		}else if(tripletHand != null) {
 			// return THREE_OF_KIND
-			return handRanking;
+			return tripletHand;
 		}
-		else if(pairs.size() > 0) {
+		else if(pairs != null && pairs.size() > 0) {
 			if(pairs.size() >= 2) {
 				Collections.sort(pairs, Collections.reverseOrder());
 				// set TWO_PAIR
+				handRanking = new HandRanking();
 				handRanking.setType(ScoreHandEnum.TWO_PAIR.name());
 				handRanking.setHandCards(pairs.get(0).getHandCards());
 				handRanking.getHandCards().addAll(pairs.get(1).getHandCards());
@@ -389,8 +412,8 @@ public class Game {
 				handRanking.setValue(calcValue(handRanking));
 				return handRanking;
 			}else {
-				Collections.sort(pairs, Collections.reverseOrder());
 				// set ONE_PAIR
+				handRanking = new HandRanking();
 				handRanking.setType(ScoreHandEnum.ONE_PAIR.name());
 				handRanking.setHandCards(pairs.get(0).getHandCards());
 				handRanking.setKickers(getKicker(playerHand, handRanking.getHandCards()));
@@ -400,6 +423,7 @@ public class Game {
 			}
 		}else {
 			// set HIGH_CARD
+			handRanking = new HandRanking();
 			handRanking.setType(ScoreHandEnum.HIGH_CARD.name());
 			handRanking.setHandCards(getKicker(playerHand, handRanking.getHandCards()));
 			handRanking.setKickers(handRanking.getHandCards());
@@ -479,8 +503,6 @@ public class Game {
 	}
 	
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		
 		Person p1 = new Person(1, "Alexandre", GenderEnum.MASCULINO.getValue());
 		Person p2 = new Person(2, "Thales", GenderEnum.MASCULINO.getValue());
 		Person p3 = new Person(3, "Julia", GenderEnum.FEMININO.getValue());
