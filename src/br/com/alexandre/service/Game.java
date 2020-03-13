@@ -151,19 +151,15 @@ public class Game {
 		Map<Integer, Long> rankCount = new HashMap<Integer, Long>();
 		Collections.sort(ranks, Collections.reverseOrder());
 		for(Integer rank : ranks) {
-			if(rank.equals(14))
-				rankCount.put(1, ranks.stream().filter(item -> item == rank).count());
-			else
-				rankCount.put(rank, ranks.stream().filter(item -> item == rank).count());
+			rankCount.put(rank, ranks.stream().filter(item -> item == rank).count());
 		}
 		//sort by value
-		rankCount = rankCount.entrySet().stream().sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
-	 			 			 .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue(), (e2, e1) -> e2,LinkedHashMap::new));
+		rankCount = Util.sortByValueInteger(rankCount);
 		return rankCount;
 	}
 	
 	private List<Integer> setRanks(List<Card> playerHand) {
-		List<Integer> ranks = new ArrayList<Integer>();
+ 		List<Integer> ranks = new ArrayList<Integer>();
 		for(Card card : playerHand) {
 			if(card.getRank() == 1)
 				ranks.add(14);
@@ -264,6 +260,8 @@ public class Game {
 	
 	private List<Card> getCardsByRank(Integer rank, List<Card> playerHand){
 		List<Card> amontCards = new ArrayList<Card>();
+		if(rank.equals(14))
+			rank = 1;
 		for(Card card : playerHand) {
 			if(card.getRank().equals(rank)) {
 				amontCards.add(card);
@@ -275,10 +273,37 @@ public class Game {
 	private List<Card> getKicker(List<Card> playerHand, List<Card> handCards) {
 		List<Card> kickers = new ArrayList<Card>();
 		kickers.addAll(playerHand);
-		kickers.removeAll(handCards);
+		if(handCards != null && handCards.size() > 0)
+			kickers.removeAll(handCards);
+		aceTo14(kickers);
 		Collections.sort(kickers, Collections.reverseOrder());
+		fourteenToAce(kickers);
 		kickers = kickers.subList(0, (5 - handCards.size()));
 		return kickers;
+	}
+	
+	private List<Card> setHighCard(List<Card> playerHand){
+		aceTo14(playerHand);
+		Collections.sort(playerHand, Collections.reverseOrder());
+		fourteenToAce(playerHand);
+		playerHand = playerHand.subList(0, 5);
+		return playerHand;
+	}
+	
+	private List<Card> aceTo14(List<Card> cards){
+		for(Card card : cards) {
+			if(card.getRank().equals(1))
+				card.setRank(14);
+		}
+		return cards;
+	}
+	
+	private List<Card> fourteenToAce(List<Card> cards){
+		for(Card card : cards) {
+			if(card.getRank().equals(14))
+				card.setRank(1);
+		}
+		return cards;
 	}
 	
 	private Map<String, List<HandRanking>> checkAmountOfKind(List<Card> playerHand) {
@@ -395,13 +420,13 @@ public class Game {
 			handRanking.setKickers(handRanking.getHandCards());
 			handRanking.setValue(calcValue(handRanking));
 			return handRanking;
-		}else if(tripletHand != null) {
+		}
+		if(tripletHand != null) {
 			// return THREE_OF_KIND
 			return tripletHand;
 		}
 		else if(pairs != null && pairs.size() > 0) {
 			if(pairs.size() >= 2) {
-				Collections.sort(pairs, Collections.reverseOrder());
 				// set TWO_PAIR
 				handRanking = new HandRanking();
 				handRanking.setType(ScoreHandEnum.TWO_PAIR.name());
@@ -425,12 +450,11 @@ public class Game {
 			// set HIGH_CARD
 			handRanking = new HandRanking();
 			handRanking.setType(ScoreHandEnum.HIGH_CARD.name());
-			handRanking.setHandCards(getKicker(playerHand, handRanking.getHandCards()));
+			handRanking.setHandCards(setHighCard(playerHand));
 			handRanking.setKickers(handRanking.getHandCards());
 			handRanking.setValue(calcValue(handRanking));
 			return handRanking;
 		}
-		return handRanking;
 	}
 	
 	private Double setValueLevels(HandRanking handRanking) {
@@ -452,7 +476,7 @@ public class Game {
 		case "FULL_HOUSE":
 			value = ScoreHandEnum.FULL_HOUSE.getValue();
 			value += (double) handCards.get(0).getRank() * LevelValueEnum.LEVEL_ONE.getValue();
-            value += (double) handCards.get(handCards.size()-1).getRank() * LevelValueEnum.LEVEL_TWO.getValue();
+            value += (double) handCards.get(3).getRank() * LevelValueEnum.LEVEL_TWO.getValue();
 			break;
 		case "FLUSH":
 			value = ScoreHandEnum.FLUSH.getValue();
@@ -467,7 +491,7 @@ public class Game {
 		case "TWO_PAIR":
 			value = ScoreHandEnum.TWO_PAIR.getValue();
 			value += (double) handCards.get(0).getRank() * LevelValueEnum.LEVEL_ONE.getValue();
-            value += (double) handCards.get(handCards.size()-1).getRank() * LevelValueEnum.LEVEL_TWO.getValue();
+            value += (double) handCards.get(2).getRank() * LevelValueEnum.LEVEL_TWO.getValue();
 			break;
 		case "ONE_PAIR":
 			value = ScoreHandEnum.ONE_PAIR.getValue();
@@ -494,9 +518,9 @@ public class Game {
 	private Double setValueKickers(List<Card> kickers) {
 		Double value = 0.0;
 		Integer level = LevelValueEnum.LEVEL_FIVE.getValue();
-		Collections.sort(kickers, Collections.reverseOrder());
+		Collections.sort(kickers);
 		for(Card card : kickers) {
-			value = (double) (card.getRank()*level);
+			value += (double) (card.getRank()*level);
 			level *= 10;
 		}
 		return value;

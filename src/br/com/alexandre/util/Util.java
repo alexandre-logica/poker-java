@@ -20,7 +20,13 @@ public class Util {
             public int compare(Map.Entry<Integer, Long> o1,  
                                Map.Entry<Integer, Long> o2) 
             { 
-                return (o1.getValue()).compareTo(o2.getValue()); 
+            	
+            	int sComp = o2.getValue().compareTo(o1.getValue()); 
+                if (sComp != 0) {
+                    return sComp;
+                 } 
+                
+                return o2.getKey().compareTo(o1.getKey());
             } 
         }); 
           
