@@ -2,9 +2,11 @@ package br.com.alexandre.domain;
 
 import java.util.List;
 
+import br.com.alexandre.domain.aux.ScoreHandEnum;
+
 public class HandRanking implements Comparable<HandRanking>{
 
-	private String type;
+	private ScoreHandEnum type;
 	private Double value;
 	private List<Card> handCards;
 	private List<Card> kickers;
@@ -13,11 +15,11 @@ public class HandRanking implements Comparable<HandRanking>{
 		
 	}
 
-	public String getType() {
+	public ScoreHandEnum getType() {
 		return type;
 	}
 
-	public void setType(String type) {
+	public void setType(ScoreHandEnum type) {
 		this.type = type;
 	}
 

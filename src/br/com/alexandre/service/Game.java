@@ -183,7 +183,7 @@ public class Game {
 					}
 				}
 			Collections.sort(flushCards, Collections.reverseOrder());
-			handRanking.setType(ScoreHandEnum.FLUSH.name());
+			handRanking.setType(ScoreHandEnum.FLUSH);
 			handRanking.setHandCards(flushCards.subList(0, 5));
 		}
 		
@@ -241,14 +241,14 @@ public class Game {
 			}
 			if(straightFlush.size() == 1) {
 				if(straightCards.get(0).getRank().equals(1)) {
-					handRanking.setType(ScoreHandEnum.ROYAL_FLUSH.name());
+					handRanking.setType(ScoreHandEnum.ROYAL_FLUSH);
 					handRanking.setHandCards(straightCards);
 				}else {
-					handRanking.setType(ScoreHandEnum.STRAIGHT_FLUSH.name());
+					handRanking.setType(ScoreHandEnum.STRAIGHT_FLUSH);
 					handRanking.setHandCards(straightCards);
 				}
 			}else {
-				handRanking.setType(ScoreHandEnum.STRAIGHT.name());
+				handRanking.setType(ScoreHandEnum.STRAIGHT);
 				handRanking.setHandCards(straightCards);
 			}
 		}
@@ -316,7 +316,7 @@ public class Game {
 			if(entry.getValue().equals(4L)) {
 				// set FOUR_OF_KIND
 				HandRanking handRanking = new HandRanking();
-				handRanking.setType(ScoreHandEnum.FOUR_OF_KIND.name());
+				handRanking.setType(ScoreHandEnum.FOUR_OF_KIND);
 				handRanking.setHandCards(getCardsByRank(entry.getKey(), playerHand));
 				handRanking.setKickers(getKicker(playerHand, handRanking.getHandCards()));
 				handRanking.getHandCards().addAll(handRanking.getKickers());
@@ -327,7 +327,7 @@ public class Game {
 				if(entry.getValue().equals(3L)) {
 					// set THREE_OF_KIND
 					HandRanking handRanking = new HandRanking();
-					handRanking.setType(ScoreHandEnum.THREE_OF_KIND.name());
+					handRanking.setType(ScoreHandEnum.THREE_OF_KIND);
 					handRanking.setHandCards(getCardsByRank(entry.getKey(), playerHand));
 					triplets.add(handRanking);
 					amountOfKinds.put("triplets", triplets);
@@ -335,7 +335,7 @@ public class Game {
 				if(entry.getValue().equals(2L)) {
 					// set ONE_PAIR
 					HandRanking handRanking = new HandRanking();
-					handRanking.setType(ScoreHandEnum.ONE_PAIR.name());
+					handRanking.setType(ScoreHandEnum.ONE_PAIR);
 					handRanking.setHandCards(getCardsByRank(entry.getKey(), playerHand));
 					pairs.add(handRanking);
 					amountOfKinds.put("pairs", pairs);
@@ -347,7 +347,6 @@ public class Game {
 		return amountOfKinds;
 	}
 	
-	@SuppressWarnings("unused")
 	private HandRanking setPlayerScore(List<Card> playerHand) {
 		List<HandRanking> pairs = null;
 		List<HandRanking> triplets = null;
@@ -363,12 +362,12 @@ public class Game {
 		HandRanking tripletHand = null;
 		HandRanking handRanking = null;
 		
-		if(straightHand != null && straightHand.getType().equals(ScoreHandEnum.ROYAL_FLUSH.name())) {
+		if(straightHand != null && straightHand.getType().equals(ScoreHandEnum.ROYAL_FLUSH)) {
 			// set ROYAL_FLUSH
 			handRanking = straightHand;
 			handRanking.setValue(calcValue(handRanking));
 			return handRanking;
-		}else if(straightHand != null && straightHand.getType().equals(ScoreHandEnum.STRAIGHT_FLUSH.name())) {
+		}else if(straightHand != null && straightHand.getType().equals(ScoreHandEnum.STRAIGHT_FLUSH)) {
 			// set STRAIGHT_FLUSH
 			handRanking = straightHand;
 			handRanking.setKickers(handRanking.getHandCards());
@@ -382,7 +381,7 @@ public class Game {
 				// set FULL_HOUSE
 				Collections.sort(triplets, Collections.reverseOrder());
 				handRanking = new HandRanking();
-				handRanking.setType(ScoreHandEnum.FULL_HOUSE.name());
+				handRanking.setType(ScoreHandEnum.FULL_HOUSE);
 				handRanking.setHandCards(triplets.get(0).getHandCards());
 				handRanking.getHandCards().addAll(triplets.get(1).getHandCards());
 				handRanking.getHandCards().remove(handRanking.getHandCards().size()-1);
@@ -393,7 +392,7 @@ public class Game {
 				Collections.sort(triplets, Collections.reverseOrder());
 				Collections.sort(pairs, Collections.reverseOrder());
 				handRanking = new HandRanking();
-				handRanking.setType(ScoreHandEnum.FULL_HOUSE.name());
+				handRanking.setType(ScoreHandEnum.FULL_HOUSE);
 				handRanking.setHandCards(triplets.get(0).getHandCards());
 				handRanking.getHandCards().addAll(pairs.get(0).getHandCards());
 				handRanking.setValue(calcValue(handRanking));
@@ -401,7 +400,7 @@ public class Game {
 			}else {
 				// set THREE_OF_KIND
 				handRanking = new HandRanking();
-				handRanking.setType(ScoreHandEnum.THREE_OF_KIND.name());
+				handRanking.setType(ScoreHandEnum.THREE_OF_KIND);
 				handRanking.setHandCards(triplets.get(0).getHandCards());
 				handRanking.setKickers(getKicker(playerHand, handRanking.getHandCards()));
 				handRanking.getHandCards().addAll(handRanking.getKickers());
@@ -414,7 +413,7 @@ public class Game {
 			handRanking.setKickers(handRanking.getHandCards());
 			handRanking.setValue(calcValue(handRanking));
 			return handRanking;
-		}else if(straightHand != null && straightHand.getType().equals(ScoreHandEnum.STRAIGHT.name())) {
+		}else if(straightHand != null && straightHand.getType().equals(ScoreHandEnum.STRAIGHT)) {
 			// set STRAIGHT
 			handRanking = straightHand;
 			handRanking.setKickers(handRanking.getHandCards());
@@ -429,7 +428,7 @@ public class Game {
 			if(pairs.size() >= 2) {
 				// set TWO_PAIR
 				handRanking = new HandRanking();
-				handRanking.setType(ScoreHandEnum.TWO_PAIR.name());
+				handRanking.setType(ScoreHandEnum.TWO_PAIR);
 				handRanking.setHandCards(pairs.get(0).getHandCards());
 				handRanking.getHandCards().addAll(pairs.get(1).getHandCards());
 				handRanking.setKickers(getKicker(playerHand, handRanking.getHandCards()));
@@ -439,7 +438,7 @@ public class Game {
 			}else {
 				// set ONE_PAIR
 				handRanking = new HandRanking();
-				handRanking.setType(ScoreHandEnum.ONE_PAIR.name());
+				handRanking.setType(ScoreHandEnum.ONE_PAIR);
 				handRanking.setHandCards(pairs.get(0).getHandCards());
 				handRanking.setKickers(getKicker(playerHand, handRanking.getHandCards()));
 				handRanking.getHandCards().addAll(handRanking.getKickers());
@@ -449,7 +448,7 @@ public class Game {
 		}else {
 			// set HIGH_CARD
 			handRanking = new HandRanking();
-			handRanking.setType(ScoreHandEnum.HIGH_CARD.name());
+			handRanking.setType(ScoreHandEnum.HIGH_CARD);
 			handRanking.setHandCards(setHighCard(playerHand));
 			handRanking.setKickers(handRanking.getHandCards());
 			handRanking.setValue(calcValue(handRanking));
@@ -460,44 +459,44 @@ public class Game {
 	private Double setValueLevels(HandRanking handRanking) {
 		Double value = 0.0;
 		List<Card> handCards = handRanking.getHandCards();
-		String type = handRanking.getType();
+		ScoreHandEnum type = handRanking.getType();
 		
 		switch (type) {
-		case "ROYAL_FLUSH":
+		case ROYAL_FLUSH:
 			value = ScoreHandEnum.ROYAL_FLUSH.getValue();
 			break;
-		case "STRAIGHT_FLUSH":
+		case STRAIGHT_FLUSH:
 			value = ScoreHandEnum.STRAIGHT_FLUSH.getValue();
 			break;
-		case "FOUR_OF_KIND":
+		case FOUR_OF_KIND:
 			value = ScoreHandEnum.FOUR_OF_KIND.getValue();
 			value += (double) handCards.get(0).getRank() * LevelValueEnum.LEVEL_ONE.getValue();
 			break;
-		case "FULL_HOUSE":
+		case FULL_HOUSE:
 			value = ScoreHandEnum.FULL_HOUSE.getValue();
 			value += (double) handCards.get(0).getRank() * LevelValueEnum.LEVEL_ONE.getValue();
             value += (double) handCards.get(3).getRank() * LevelValueEnum.LEVEL_TWO.getValue();
 			break;
-		case "FLUSH":
+		case FLUSH:
 			value = ScoreHandEnum.FLUSH.getValue();
 			break;
-		case "STRAIGHT":
+		case STRAIGHT:
 			value = ScoreHandEnum.STRAIGHT.getValue();
 			break;
-		case "THREE_OF_KIND":
+		case THREE_OF_KIND:
 			value = ScoreHandEnum.THREE_OF_KIND.getValue();
 			value += (double) handCards.get(0).getRank() * LevelValueEnum.LEVEL_ONE.getValue();
 			break;
-		case "TWO_PAIR":
+		case TWO_PAIR:
 			value = ScoreHandEnum.TWO_PAIR.getValue();
 			value += (double) handCards.get(0).getRank() * LevelValueEnum.LEVEL_ONE.getValue();
             value += (double) handCards.get(2).getRank() * LevelValueEnum.LEVEL_TWO.getValue();
 			break;
-		case "ONE_PAIR":
+		case ONE_PAIR:
 			value = ScoreHandEnum.ONE_PAIR.getValue();
 			value += (double) handCards.get(0).getRank() * LevelValueEnum.LEVEL_ONE.getValue();
 			break;
-		case "HIGH_CARD":
+		case HIGH_CARD:
 			value = ScoreHandEnum.HIGH_CARD.getValue();
 			break;
 
