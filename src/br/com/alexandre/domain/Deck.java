@@ -25,7 +25,7 @@ public class Deck {
 				FULLDECK.add(card);
 			}
 		}
-		Collections.shuffle(FULLDECK);
+		shuffle();
 	}
 	
     public void shuffle() {
@@ -39,6 +39,7 @@ public class Deck {
     }
 
 	public List<Card> getFULLDECK() {
+		shuffle();
 		return FULLDECK;
 	}
 

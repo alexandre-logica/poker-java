@@ -8,6 +8,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 public class Util {
 
@@ -59,19 +61,19 @@ public class Util {
         return temp; 
     }
 	
-    public static List<Integer> orderedWithNoGap(Set<Integer> list) {       
+    public static List<Integer> orderedWithNoGap(SortedSet<Integer> list) {       
         Integer prev = null;
         int seq = 0;
         List<Integer> straight = new ArrayList<Integer>();
         for(Integer i : list) {
-            if(prev != null && prev-1 == i) {
+            if(prev != null && prev+1 == i) {
                 if(seq == 0) {
                 	seq = 2;
-                	straight.add(i);
-                	straight.add(0, prev);
+                	straight.add(prev);
+                	straight.add(0, i);
                 }else {
                 	seq++;
-                	straight.add(i);
+                	straight.add(0, i);
                 }
             }else {
             	seq = 0;

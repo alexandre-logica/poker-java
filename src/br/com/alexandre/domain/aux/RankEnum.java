@@ -2,7 +2,6 @@ package br.com.alexandre.domain.aux;
 
 public enum RankEnum {
 
-	ACE(1, "A"),
 	TWO(2, "2"),
 	THREE(3, "3"),
 	FOUR(4, "4"),
@@ -14,7 +13,8 @@ public enum RankEnum {
 	TEN(10, "10"),
 	JACK(11, "J"),
 	QUEEN(12, "Q"),
-	KING(13, "K");
+	KING(13, "K"),
+	ACE(14, "A");
 	
 	private Integer value;
 	private String character;
