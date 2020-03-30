@@ -2,7 +2,7 @@ package br.com.alexandre.domain;
 
 import java.util.List;
 
-import br.com.alexandre.domain.aux.ScoreHandEnum;
+import br.com.alexandre.enuns.ScoreHandEnum;
 
 public class HandRanking implements Comparable<HandRanking>{
 

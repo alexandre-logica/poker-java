@@ -9,23 +9,28 @@ public class Table {
 	private Long id;
 	private List<TablePlayer> tablePlayers;
 	private List<Hand> hands;
-	private Double initialCashBet = 0.0;
+	private Double initialBigBlind;
+	private Double initialChipsPlayers;
 	private LocalDateTime gameStart;
 	private LocalDateTime gameFinish;
 	private Boolean gameOver;
+	private Integer increaseBlindMinutes;
 	
-	public Table(Long id, List<TablePlayer> tablePlayers, List<Hand> hands, Double initialCashBet, LocalDateTime gameStart, LocalDateTime gameFinish, Boolean gameOver) {
+	public Table(Long id, List<TablePlayer> tablePlayers, List<Hand> hands, Double initialBigBlind, Double initialChipsPlayers,  
+			     LocalDateTime gameStart, LocalDateTime gameFinish, Boolean gameOver, Integer increaseBlindMinutes) {
 		this.id = id;
 		this.tablePlayers = tablePlayers;
 		this.hands = hands;
-		this.initialCashBet = initialCashBet;
+		this.initialBigBlind = initialBigBlind;
+		this.initialChipsPlayers= initialChipsPlayers;
 		this.gameStart = gameStart;
 		this.gameFinish = gameFinish;
 		this.gameOver = gameOver;
+		this.increaseBlindMinutes = increaseBlindMinutes;
 	}
 	
-	public Table(Long id, Double initialCashBet, LocalDateTime gameStart) {
-		this(id, new ArrayList<TablePlayer>(), new ArrayList<Hand>(), initialCashBet, gameStart, null, false);
+	public Table(Long id, Double initialBigBlind, Double initialChipsPlayers, LocalDateTime gameStart) {
+		this(id, new ArrayList<TablePlayer>(), new ArrayList<Hand>(), initialBigBlind, initialChipsPlayers, gameStart, null, false, 2);
 	}
 
 	public Long getId() {
@@ -52,12 +57,20 @@ public class Table {
 		this.hands = hands;
 	}
 
-	public Double getInitialCashBet() {
-		return initialCashBet;
+	public Double getInitialBigBlind() {
+		return initialBigBlind;
 	}
 
-	public void setInitialCashBet(Double initialCashBet) {
-		this.initialCashBet = initialCashBet;
+	public void setInitialBigBlind(Double initialBigBlind) {
+		this.initialBigBlind = initialBigBlind;
+	}
+	
+	public Double getInitialChipsPlayers() {
+		return initialChipsPlayers;
+	}
+
+	public void setInitialChipsPlayers(Double initialChipsPlayers) {
+		this.initialChipsPlayers = initialChipsPlayers;
 	}
 
 	public LocalDateTime getGameStart() {

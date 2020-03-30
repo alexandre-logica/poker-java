@@ -1,4 +1,4 @@
-package br.com.alexandre.domain.aux;
+package br.com.alexandre.enuns;
 
 public enum LevelValueEnum {
 

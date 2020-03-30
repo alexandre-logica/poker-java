@@ -2,14 +2,18 @@ package br.com.alexandre.domain;
 
 import java.io.Serializable;
 
-public class Person implements Serializable{
+public class Client implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
 	private int id;
 	private String nome;
 	private String genero;
 	
-	public Person(int id, String nome, String genero) {
+	public Client() {
+		
+	}
+	
+	public Client(int id, String nome, String genero) {
 		super();
 		this.id = id;
 		this.nome = nome;

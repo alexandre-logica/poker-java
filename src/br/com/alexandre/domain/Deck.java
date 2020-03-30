@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import br.com.alexandre.domain.aux.RankEnum;
-import br.com.alexandre.domain.aux.SuitsEnum;
+import br.com.alexandre.enuns.RankEnum;
+import br.com.alexandre.enuns.SuitsEnum;
 
 public class Deck {
 

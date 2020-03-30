@@ -3,7 +3,7 @@ package br.com.alexandre.domain;
 import java.util.ArrayList;
 import java.util.List;
 
-import br.com.alexandre.domain.aux.StatusEnum;
+import br.com.alexandre.enuns.StatusEnum;
 
 public class HandPlayer {
 
@@ -13,13 +13,12 @@ public class HandPlayer {
 	private List<Card> cards;
 	private String status;
 	private Boolean winner;
-	private HandRanking handRanking; 
 	
 	public HandPlayer() {
 		
 	}
 	
-	public HandPlayer(Long id, Hand hand, TablePlayer tablePlayer, List<Card> cards, String status, Boolean winner, HandRanking handRanking) {
+	public HandPlayer(Long id, Hand hand, TablePlayer tablePlayer, List<Card> cards, String status, Boolean winner) {
 		super();
 		this.id = id;
 		this.hand = hand;
@@ -27,11 +26,10 @@ public class HandPlayer {
 		this.cards = cards;
 		this.status = status;
 		this.winner = winner;
-		this.handRanking = handRanking;
 	}
 	
 	public HandPlayer(Long id, Hand hand, TablePlayer tablePlayer) {
-		this(id, hand, tablePlayer, new ArrayList<Card>(), StatusEnum.IN.toString(), false, new HandRanking());
+		this(id, hand, tablePlayer, new ArrayList<Card>(), StatusEnum.IN.toString(), false);
 	}
 	
 	public Long getId() {
@@ -82,12 +80,4 @@ public class HandPlayer {
 		this.winner = winner;
 	}
 
-	public HandRanking getHandRanking() {
-		return handRanking;
-	}
-
-	public void setHandRanking(HandRanking handRanking) {
-		this.handRanking = handRanking;
-	}
-	
 }

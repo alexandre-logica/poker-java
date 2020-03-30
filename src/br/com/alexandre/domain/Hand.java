@@ -5,31 +5,33 @@ import java.util.List;
 
 public class Hand {
 
-	private Long id;
-	private List<HandPlayer> handPlayers = new ArrayList<>();
-	private List<Round> rounds = new ArrayList<>();
-	private List<HandCard> handCards = new ArrayList<>();
+	private Integer number;
+	private List<HandPlayer> handPlayers;
+	private List<Round> rounds;
+	private List<HandCard> handCards;
+	private List<HandRanking> handRankings;
 	private Deck deck;
 	
-	public Hand(Long id, List<HandPlayer> handPlayers, List<Round> rounds, List<HandCard> handCards, Deck deck) {
+	public Hand(Integer number, List<HandPlayer> handPlayers, List<Round> rounds, List<HandCard> handCards, List<HandRanking> handRankings, Deck deck) {
 		super();
-		this.id = id;
+		this.number = number;
 		this.handPlayers = handPlayers;
 		this.rounds = rounds;
 		this.handCards = handCards;
+		this.handRankings = handRankings;
 		this.deck = deck;
 	}
 	
-	public Hand(Long id, Deck deck) {
-		this(id, new ArrayList<HandPlayer>(), new ArrayList<Round>(), new ArrayList<HandCard>(), deck);
+	public Hand(Integer number, Deck deck) {
+		this(number, new ArrayList<HandPlayer>(), new ArrayList<Round>(), new ArrayList<HandCard>(), new ArrayList<HandRanking>(), deck);
 	}
 
-	public Long getId() {
-		return id;
+	public Integer getNumber() {
+		return number;
 	}
 
-	public void setId(Long id) {
-		this.id = id;
+	public void setNumber(Integer number) {
+		this.number = number;
 	}
 
 	public List<HandPlayer> getHandPlayers() {
@@ -62,6 +64,14 @@ public class Hand {
 
 	public void setDeck(Deck deck) {
 		this.deck = deck;
+	}
+
+	public List<HandRanking> getHandRankings() {
+		return handRankings;
+	}
+
+	public void setHandRankings(List<HandRanking> handRankings) {
+		this.handRankings = handRankings;
 	}
 	
 }

@@ -1,28 +1,20 @@
 package br.com.alexandre.domain;
 
-public class TablePlayer {
+public class TablePlayer implements Comparable<TablePlayer> {
 
-	private Long id;
 	private Table table;
 	private Player player;
-	private int position;
+	private Integer position;
 	private Boolean dealer;
+	private Double chips;
 	
-	public TablePlayer(Long id, Table table, Player player, int position, Boolean dealer) {
+	public TablePlayer(Table table, Player player, Integer position, Boolean dealer, Double chips) {
 		super();
-		this.id = id;
 		this.table = table;
 		this.player = player;
 		this.position = position;
 		this.dealer = dealer;
-	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
+		this.chips = chips;
 	}
 
 	public Table getTable() {
@@ -41,11 +33,11 @@ public class TablePlayer {
 		this.player = player;
 	}
 
-	public int getPosition() {
+	public Integer getPosition() {
 		return position;
 	}
 
-	public void setPosition(int position) {
+	public void setPosition(Integer position) {
 		this.position = position;
 	}
 
@@ -55,6 +47,19 @@ public class TablePlayer {
 
 	public void setDealer(Boolean dealer) {
 		this.dealer = dealer;
+	}
+
+	public Double getChips() {
+		return chips;
+	}
+
+	public void setChips(Double chips) {
+		this.chips = chips;
+	}
+
+	@Override
+	public int compareTo(TablePlayer o) {
+		return this.getPosition().compareTo(o.getPosition());
 	}
 	
 }

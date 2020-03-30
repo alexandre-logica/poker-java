@@ -5,44 +5,49 @@ import java.util.List;
 
 public class Round {
 
-	private long id;
-	private int number;
-	private int pot;
-	private int totalPlayers;
+	private Integer number;
+	private Double pot;
+	private Integer totalPlayers;
 	private Hand hand;
-	private List<ActionPlayer> actionPlayers = new ArrayList<ActionPlayer>();
+	private List<RoundPlayer> roundPlayers = new ArrayList<RoundPlayer>();
+	private Boolean winner;
 	
-	public Round(long id, int number, int pot, Hand hand, List<ActionPlayer> actionPlayers, int totalPlayers) {
-		this.id = id;
+	public Round(Integer number, Double pot, Integer totalPlayers, Hand hand, List<RoundPlayer> roundPlayers, Boolean winner) {
+		super();
 		this.number = number;
 		this.pot = pot;
-		this.hand = hand;
-		this.actionPlayers = actionPlayers;
 		this.totalPlayers = totalPlayers;
+		this.hand = hand;
+		this.roundPlayers = roundPlayers;
+		this.winner = winner;
+	}
+	
+	public Round(Integer number, Hand hand) {
+		this(number, 0.0, 0, hand, new ArrayList<RoundPlayer>(), false);
 	}
 
-	public long getId() {
-		return id;
-	}
-
-	public void setId(long id) {
-		this.id = id;
-	}
-
-	public int getNumber() {
+	public Integer getNumber() {
 		return number;
 	}
 
-	public void setNumber(int number) {
+	public void setNumber(Integer number) {
 		this.number = number;
 	}
 
-	public int getPot() {
+	public Double getPot() {
 		return pot;
 	}
 
-	public void setPot(int pot) {
+	public void setPot(Double pot) {
 		this.pot = pot;
+	}
+
+	public Integer getTotalPlayers() {
+		return totalPlayers;
+	}
+
+	public void setTotalPlayers(Integer totalPlayers) {
+		this.totalPlayers = totalPlayers;
 	}
 
 	public Hand getHand() {
@@ -53,20 +58,20 @@ public class Round {
 		this.hand = hand;
 	}
 
-	public List<ActionPlayer> getActionPlayers() {
-		return actionPlayers;
+	public List<RoundPlayer> getRoundPlayers() {
+		return roundPlayers;
 	}
 
-	public void setActionPlayers(List<ActionPlayer> actionPlayers) {
-		this.actionPlayers = actionPlayers;
+	public void setRoundPlayers(List<RoundPlayer> roundPlayers) {
+		this.roundPlayers = roundPlayers;
 	}
 
-	public int getTotalPlayers() {
-		return totalPlayers;
+	public Boolean getWinner() {
+		return winner;
 	}
 
-	public void setTotalPlayers(int totalPlayers) {
-		this.totalPlayers = totalPlayers;
+	public void setWinner(Boolean winner) {
+		this.winner = winner;
 	}
 	
 }
