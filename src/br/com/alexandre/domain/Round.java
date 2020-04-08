@@ -11,8 +11,12 @@ public class Round {
 	private Hand hand;
 	private List<RoundPlayer> roundPlayers = new ArrayList<RoundPlayer>();
 	private Boolean winner;
+	private Boolean allIn;
+	private Double allInValue;
+	private Double currentBet;
 	
-	public Round(Integer number, Double pot, Integer totalPlayers, Hand hand, List<RoundPlayer> roundPlayers, Boolean winner) {
+	public Round(Integer number, Double pot, Integer totalPlayers, Hand hand, List<RoundPlayer> roundPlayers,
+			Boolean winner, Boolean allIn, Double allInValue, Double currentBet) {
 		super();
 		this.number = number;
 		this.pot = pot;
@@ -20,10 +24,13 @@ public class Round {
 		this.hand = hand;
 		this.roundPlayers = roundPlayers;
 		this.winner = winner;
+		this.allIn = allIn;
+		this.allInValue = allInValue;
+		this.currentBet = currentBet;
 	}
-	
+
 	public Round(Integer number, Hand hand) {
-		this(number, 0.0, 0, hand, new ArrayList<RoundPlayer>(), false);
+		this(number, 0.0, 0, hand, new ArrayList<RoundPlayer>(), false, false, 0.0, 0.0);
 	}
 
 	public Integer getNumber() {
@@ -72,6 +79,30 @@ public class Round {
 
 	public void setWinner(Boolean winner) {
 		this.winner = winner;
+	}
+
+	public Boolean getAllIn() {
+		return allIn;
+	}
+
+	public void setAllIn(Boolean allIn) {
+		this.allIn = allIn;
+	}
+
+	public Double getAllInValue() {
+		return allInValue;
+	}
+
+	public void setAllInValue(Double allInValue) {
+		this.allInValue = allInValue;
+	}
+
+	public Double getCurrentBet() {
+		return currentBet;
+	}
+
+	public void setCurrentBet(Double currentBet) {
+		this.currentBet = currentBet;
 	}
 	
 }

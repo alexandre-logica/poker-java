@@ -72,6 +72,21 @@ public class ShowCards {
 			}
 		}
 	}
+	
+	public void showTableCards(Integer roundNumber) {
+		switch (roundNumber) {
+		case 1:
+			showFlop();
+			break;
+		case 2:
+			showTurn();
+			break;
+		case 3:
+			showRiver();
+		default:
+			break;
+		}
+	}
 
 	public void showPlayerCards() {
 		System.out.println();

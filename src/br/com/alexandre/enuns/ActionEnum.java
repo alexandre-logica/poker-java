@@ -2,9 +2,9 @@ package br.com.alexandre.enuns;
 
 public enum ActionEnum {
 
-	CHECK("C"),
-	FOLD("F"),
-	BET("B");
+	CHECK("c"),
+	FOLD("f"),
+	BET("b");
 	
 	private String value;
 	
@@ -14,6 +14,19 @@ public enum ActionEnum {
 
 	public String getValue() {
 		return value;
+	}
+	
+	public static ActionEnum getActionEnumFromValue(String value) {
+		switch (value) {
+		case "c":
+			return ActionEnum.CHECK;
+		case "b":
+			return ActionEnum.BET;
+		case "f":
+			return ActionEnum.FOLD;
+		default:
+			return null;
+		}
 	}
 
 }

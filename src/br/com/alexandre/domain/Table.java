@@ -15,9 +15,10 @@ public class Table {
 	private LocalDateTime gameFinish;
 	private Boolean gameOver;
 	private Integer increaseBlindMinutes;
+	private Double currentBigBlind;
 	
 	public Table(Long id, List<TablePlayer> tablePlayers, List<Hand> hands, Double initialBigBlind, Double initialChipsPlayers,  
-			     LocalDateTime gameStart, LocalDateTime gameFinish, Boolean gameOver, Integer increaseBlindMinutes) {
+			     LocalDateTime gameStart, LocalDateTime gameFinish, Boolean gameOver, Integer increaseBlindMinutes, Double currentBigBlind) {
 		this.id = id;
 		this.tablePlayers = tablePlayers;
 		this.hands = hands;
@@ -27,10 +28,11 @@ public class Table {
 		this.gameFinish = gameFinish;
 		this.gameOver = gameOver;
 		this.increaseBlindMinutes = increaseBlindMinutes;
+		this.currentBigBlind = currentBigBlind;
 	}
 	
 	public Table(Long id, Double initialBigBlind, Double initialChipsPlayers, LocalDateTime gameStart) {
-		this(id, new ArrayList<TablePlayer>(), new ArrayList<Hand>(), initialBigBlind, initialChipsPlayers, gameStart, null, false, 2);
+		this(id, new ArrayList<TablePlayer>(), new ArrayList<Hand>(), initialBigBlind, initialChipsPlayers, gameStart, null, false, 2, initialBigBlind);
 	}
 
 	public Long getId() {
@@ -95,6 +97,22 @@ public class Table {
 
 	public void setGameOver(Boolean gameOver) {
 		this.gameOver = gameOver;
+	}
+
+	public Integer getIncreaseBlindMinutes() {
+		return increaseBlindMinutes;
+	}
+
+	public void setIncreaseBlindMinutes(Integer increaseBlindMinutes) {
+		this.increaseBlindMinutes = increaseBlindMinutes;
+	}
+
+	public Double getCurrentBigBlind() {
+		return currentBigBlind;
+	}
+
+	public void setCurrentBigBlind(Double currentBigBlind) {
+		this.currentBigBlind = currentBigBlind;
 	}
 	
 }

@@ -1,7 +1,5 @@
 package br.com.alexandre.domain;
 
-import br.com.alexandre.enuns.ActionEnum;
-
 public class RoundPlayer {
 
 	private Long id;
@@ -10,15 +8,15 @@ public class RoundPlayer {
 	private Boolean smallBlind;
 	private Boolean bigBlind;
 	private Boolean dealer;
-	private ActionEnum action;
-	private Double betValue;
+	private ActionPlayer action;
+	private Boolean allIn;
 	
 	public RoundPlayer() {
 		
 	}
-	
+
 	public RoundPlayer(Long id, Round round, HandPlayer handPlayer, Boolean smallBlind, Boolean bigBlind,
-			Boolean dealer, ActionEnum action, Double betValue) {
+			Boolean dealer, ActionPlayer action, Boolean allIn) {
 		super();
 		this.id = id;
 		this.round = round;
@@ -27,56 +25,71 @@ public class RoundPlayer {
 		this.bigBlind = bigBlind;
 		this.dealer = dealer;
 		this.action = action;
-		this.betValue = betValue;
+		this.allIn = allIn;
 	}
 
 	public Long getId() {
 		return id;
 	}
+
 	public void setId(Long id) {
 		this.id = id;
 	}
+
 	public Round getRound() {
 		return round;
 	}
+
 	public void setRound(Round round) {
 		this.round = round;
 	}
+
 	public HandPlayer getHandPlayer() {
 		return handPlayer;
 	}
+
 	public void setHandPlayer(HandPlayer handPlayer) {
 		this.handPlayer = handPlayer;
 	}
+
 	public Boolean getSmallBlind() {
 		return smallBlind;
 	}
+
 	public void setSmallBlind(Boolean smallBlind) {
 		this.smallBlind = smallBlind;
 	}
+
 	public Boolean getBigBlind() {
 		return bigBlind;
 	}
+
 	public void setBigBlind(Boolean bigBlind) {
 		this.bigBlind = bigBlind;
 	}
+
 	public Boolean getDealer() {
 		return dealer;
 	}
+
 	public void setDealer(Boolean dealer) {
 		this.dealer = dealer;
 	}
-	public ActionEnum getAction() {
+
+	public ActionPlayer getAction() {
 		return action;
 	}
-	public void setAction(ActionEnum action) {
+
+	public void setAction(ActionPlayer action) {
 		this.action = action;
 	}
-	public Double getBetValue() {
-		return betValue;
+
+	public Boolean getAllIn() {
+		return allIn;
 	}
-	public void setBetValue(Double betValue) {
-		this.betValue = betValue;
+
+	public void setAllIn(Boolean allIn) {
+		this.allIn = allIn;
 	}
 	
 }

@@ -11,14 +11,14 @@ public class HandPlayer {
 	private Hand hand;
 	private TablePlayer tablePlayer;
 	private List<Card> cards;
-	private String status;
+	private StatusEnum status;
 	private Boolean winner;
 	
 	public HandPlayer() {
 		
 	}
 	
-	public HandPlayer(Long id, Hand hand, TablePlayer tablePlayer, List<Card> cards, String status, Boolean winner) {
+	public HandPlayer(Long id, Hand hand, TablePlayer tablePlayer, List<Card> cards, StatusEnum status, Boolean winner) {
 		super();
 		this.id = id;
 		this.hand = hand;
@@ -29,7 +29,7 @@ public class HandPlayer {
 	}
 	
 	public HandPlayer(Long id, Hand hand, TablePlayer tablePlayer) {
-		this(id, hand, tablePlayer, new ArrayList<Card>(), StatusEnum.IN.toString(), false);
+		this(id, hand, tablePlayer, new ArrayList<Card>(), StatusEnum.IN, false);
 	}
 	
 	public Long getId() {
@@ -64,14 +64,6 @@ public class HandPlayer {
 		this.cards = cards;
 	}
 
-	public String getStatus() {
-		return status;
-	}
-
-	public void setStatus(String status) {
-		this.status = status;
-	}
-
 	public Boolean getWinner() {
 		return winner;
 	}
@@ -80,4 +72,12 @@ public class HandPlayer {
 		this.winner = winner;
 	}
 
+	public StatusEnum getStatus() {
+		return status;
+	}
+
+	public void setStatus(StatusEnum status) {
+		this.status = status;
+	}
+	
 }
