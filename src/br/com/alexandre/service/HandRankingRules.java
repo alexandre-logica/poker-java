@@ -23,15 +23,15 @@ public class HandRankingRules {
 	
 	private List<Card> playerHand;
 	
-	public HandRankingRules(List<Card> playerHand) {
-		super();
-		this.playerHand = playerHand;
+	public HandRankingRules() {
+
 	}
 
-	public HandRanking setPlayerScore() {
+	public HandRanking setPlayerScore(List<Card> playerHand) {
 		List<HandRanking> pairs = null;
 		List<HandRanking> triplets = null;
 		List<HandRanking> fours = null;
+		this.playerHand = playerHand;
 		Map<String, List<HandRanking>> amountOfKinds = checkAmountOfKind();
 		if (amountOfKinds != null) {
 			pairs = amountOfKinds.get("pairs");

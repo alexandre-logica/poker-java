@@ -39,7 +39,6 @@ public class Deck {
     }
 
 	public List<Card> getFULLDECK() {
-		shuffle();
 		return FULLDECK;
 	}
 

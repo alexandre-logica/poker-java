@@ -10,6 +10,7 @@ public class HandRanking implements Comparable<HandRanking>{
 	private Double value;
 	private List<Card> handCards;
 	private List<Card> kickers;
+	private HandPlayer handPlayer;
 	
 	public HandRanking() {
 		
@@ -46,6 +47,14 @@ public class HandRanking implements Comparable<HandRanking>{
 	public void setKickers(List<Card> kickers) {
 		this.kickers = kickers;
 	}
+	
+	public HandPlayer getHandPlayer() {
+		return handPlayer;
+	}
+
+	public void setHandPlayer(HandPlayer handPlayer) {
+		this.handPlayer = handPlayer;
+	}
 
 	@Override
 	public String toString() {
@@ -56,4 +65,5 @@ public class HandRanking implements Comparable<HandRanking>{
 	public int compareTo(HandRanking o) {
 		return this.getValue().compareTo(o.getValue());
 	}
+	
 }

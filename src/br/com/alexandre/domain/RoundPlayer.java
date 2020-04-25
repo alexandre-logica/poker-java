@@ -10,13 +10,14 @@ public class RoundPlayer {
 	private Boolean dealer;
 	private ActionPlayer action;
 	private Boolean allIn;
+	private Double totalBet;
 	
 	public RoundPlayer() {
 		
 	}
 
 	public RoundPlayer(Long id, Round round, HandPlayer handPlayer, Boolean smallBlind, Boolean bigBlind,
-			Boolean dealer, ActionPlayer action, Boolean allIn) {
+			Boolean dealer, ActionPlayer action, Boolean allIn, Double totalBet) {
 		super();
 		this.id = id;
 		this.round = round;
@@ -26,6 +27,7 @@ public class RoundPlayer {
 		this.dealer = dealer;
 		this.action = action;
 		this.allIn = allIn;
+		this.totalBet = totalBet;
 	}
 
 	public Long getId() {
@@ -90,6 +92,16 @@ public class RoundPlayer {
 
 	public void setAllIn(Boolean allIn) {
 		this.allIn = allIn;
+		round.setAllIn(allIn);
+	}
+
+	public Double getTotalBet() {
+		return totalBet;
+	}
+
+	public void setTotalBet(Double totalBet) {
+		this.totalBet = totalBet;
+		handPlayer.setTotalBet(handPlayer.getTotalBet()+totalBet);
 	}
 	
 }

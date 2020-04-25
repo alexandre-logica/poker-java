@@ -75,13 +75,13 @@ public class ShowCards {
 	
 	public void showTableCards(Integer roundNumber) {
 		switch (roundNumber) {
-		case 1:
+		case 2:
 			showFlop();
 			break;
-		case 2:
+		case 3:
 			showTurn();
 			break;
-		case 3:
+		case 4:
 			showRiver();
 		default:
 			break;
@@ -100,6 +100,40 @@ public class ShowCards {
 			System.out.print("Cards: | " + player.getCards().get(0).getCharacter() + "-" + player.getCards().get(0).getSymbol());
 			System.out.println(" | " + player.getCards().get(1).getCharacter() + "-" + player.getCards().get(1).getSymbol() + " | ");
 			System.out.println();
+		}
+	}
+
+	public void showPlayerCards(HandPlayer player) {
+			System.out.print("Player cards: | " + player.getCards().get(0).getCharacter() + "-" + player.getCards().get(0).getSymbol());
+			System.out.println(" | " + player.getCards().get(1).getCharacter() + "-" + player.getCards().get(1).getSymbol() + " | ");
+			System.out.println();
+	}
+	
+	public void showWinners() {
+		System.out.println();
+		if(hand.getWinners().size() > 1)
+			System.out.println("************** Winners **************");
+		else
+			System.out.println("************** Winner **************");
+		System.out.println();
+		for (HandPlayer player : hand.getWinners()) {
+			System.out.println("Player: " + player.getTablePlayer().getPlayer().getNickname());
+			System.out.println("Pot: " + (hand.getPot() / hand.getWinners().size()));
+			System.out.println("Hand game: " + player.getHandRanking().getType().getName());
+			System.out.println("Score: " + player.getHandRanking().getValue());
+			showPlayerCards(player);
+			showHandCards();
+			System.out.println();
+			System.out.println("************** Winner hand cards **************");
+			System.out.println();
+			showPlayerHandCards(player);
+			System.out.println();
+		}
+	}
+	
+	private void showPlayerHandCards(HandPlayer player) {
+		for(Card card : player.getHandRanking().getHandCards()) {
+			System.out.print(" | " + card.getCharacter() + "-" + card.getSymbol() + " | ");
 		}
 	}
 

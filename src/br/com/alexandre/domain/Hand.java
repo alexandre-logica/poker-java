@@ -9,21 +9,27 @@ public class Hand {
 	private List<HandPlayer> handPlayers;
 	private List<Round> rounds;
 	private List<HandCard> handCards;
-	private List<HandRanking> handRankings;
+	private List<HandPlayer> winners;
 	private Deck deck;
+	private Double currentBigBlind;
+	private Double pot;
 	
-	public Hand(Integer number, List<HandPlayer> handPlayers, List<Round> rounds, List<HandCard> handCards, List<HandRanking> handRankings, Deck deck) {
+	public Hand(Integer number, List<HandPlayer> handPlayers, List<Round> rounds, List<HandCard> handCards,
+			    List<HandPlayer> winners, Deck deck, Double currentBigBlind, Double pot) {
 		super();
 		this.number = number;
 		this.handPlayers = handPlayers;
 		this.rounds = rounds;
 		this.handCards = handCards;
-		this.handRankings = handRankings;
+		this.winners = winners;
 		this.deck = deck;
+		this.currentBigBlind = currentBigBlind;
+		this.handPlayers = handPlayers;
 	}
 	
-	public Hand(Integer number, Deck deck) {
-		this(number, new ArrayList<HandPlayer>(), new ArrayList<Round>(), new ArrayList<HandCard>(), new ArrayList<HandRanking>(), deck);
+	public Hand(Integer number, Deck deck, Double currentBigBlind) {
+		this(number, new ArrayList<HandPlayer>(), new ArrayList<Round>(), new ArrayList<HandCard>(),
+			 new ArrayList<HandPlayer>(), deck, currentBigBlind, 0.0);
 	}
 
 	public Integer getNumber() {
@@ -66,12 +72,28 @@ public class Hand {
 		this.deck = deck;
 	}
 
-	public List<HandRanking> getHandRankings() {
-		return handRankings;
+	public Double getCurrentBigBlind() {
+		return currentBigBlind;
 	}
 
-	public void setHandRankings(List<HandRanking> handRankings) {
-		this.handRankings = handRankings;
+	public void setCurrentBigBlind(Double currentBigBlind) {
+		this.currentBigBlind = currentBigBlind;
+	}
+
+	public List<HandPlayer> getWinners() {
+		return winners;
+	}
+
+	public void setWinners(List<HandPlayer> winners) {
+		this.winners = winners;
+	}
+
+	public Double getPot() {
+		return pot;
+	}
+
+	public void setPot(Double pot) {
+		this.pot = pot;
 	}
 	
 }

@@ -13,12 +13,15 @@ public class HandPlayer {
 	private List<Card> cards;
 	private StatusEnum status;
 	private Boolean winner;
+	private HandRanking handRanking;
+	private Double totalBet;
+	private List<Card> playerHandCards;
 	
 	public HandPlayer() {
 		
 	}
 	
-	public HandPlayer(Long id, Hand hand, TablePlayer tablePlayer, List<Card> cards, StatusEnum status, Boolean winner) {
+	public HandPlayer(Long id, Hand hand, TablePlayer tablePlayer, List<Card> cards, StatusEnum status, Boolean winner, HandRanking handRanking, Double totalBet, List<Card> playerHandCards) {
 		super();
 		this.id = id;
 		this.hand = hand;
@@ -26,10 +29,13 @@ public class HandPlayer {
 		this.cards = cards;
 		this.status = status;
 		this.winner = winner;
+		this.handRanking = handRanking;
+		this.totalBet = totalBet;
+		this.playerHandCards = playerHandCards;
 	}
 	
 	public HandPlayer(Long id, Hand hand, TablePlayer tablePlayer) {
-		this(id, hand, tablePlayer, new ArrayList<Card>(), StatusEnum.IN, false);
+		this(id, hand, tablePlayer, new ArrayList<Card>(), StatusEnum.IN, false, new HandRanking(), 0.0, new ArrayList<Card>());
 	}
 	
 	public Long getId() {
@@ -78,6 +84,30 @@ public class HandPlayer {
 
 	public void setStatus(StatusEnum status) {
 		this.status = status;
+	}
+
+	public HandRanking getHandRanking() {
+		return handRanking;
+	}
+
+	public void setHandRanking(HandRanking handRanking) {
+		this.handRanking = handRanking;
+	}
+
+	public Double getTotalBet() {
+		return totalBet;
+	}
+
+	public void setTotalBet(Double totalBet) {
+		this.totalBet = totalBet;
+	}
+
+	public List<Card> getPlayerHandCards() {
+		return playerHandCards;
+	}
+
+	public void setPlayerHandCards(List<Card> playerHandCards) {
+		this.playerHandCards = playerHandCards;
 	}
 	
 }
