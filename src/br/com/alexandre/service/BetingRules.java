@@ -6,17 +6,14 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 import java.util.Set;
 
-import br.com.alexandre.domain.ActionPlayer;
 import br.com.alexandre.domain.Hand;
 import br.com.alexandre.domain.HandPlayer;
 import br.com.alexandre.domain.HandRanking;
 import br.com.alexandre.domain.Round;
 import br.com.alexandre.domain.RoundPlayer;
 import br.com.alexandre.enuns.ActionEnum;
-import br.com.alexandre.enuns.BlindEnum;
 import br.com.alexandre.enuns.StatusEnum;
 
 public class BetingRules {
@@ -125,31 +122,36 @@ public class BetingRules {
 			for(RoundPlayer roundPlayer : roundPlayers) {
 				if(roundIteration.equals(1)) {
 					if(roundPlayers.indexOf(roundPlayer) == 0) {
-						getBlindAction(BlindEnum.SMALL, roundPlayer);
+						// Small
+						new SmallAction(hand, roundPlayer).action();
 						round.setPot(round.getPot()+roundPlayer.getAction().getBet());
 					}else if(roundPlayers.indexOf(roundPlayer) == 1){
-						getBlindAction(BlindEnum.BIG, roundPlayer);
+						// Big
+						new BigAction(hand, roundPlayer).action();
 						round.setPot(round.getPot()+roundPlayer.getAction().getBet());
 					}else if(roundPlayers.indexOf(roundPlayer) == roundPlayers.size()-1){
-						getBlindAction(BlindEnum.FIRST_ROUND, roundPlayer);
+						// Last of First Round
+						new FirstRoundAction(hand, roundPlayer).action();
 						round.setPot(round.getPot()+roundPlayer.getAction().getBet());
 						checkPlayerBet(playerMap, roundPlayer);
 						// Small Complement
-						getBlindAction(BlindEnum.SMALL_COMPLEMENT, roundPlayers.get(0));
+						new SmallComplementAction(hand, roundPlayers.get(0)).action();
 						round.setPot(round.getPot()+roundPlayers.get(0).getAction().getBet());
 						checkPlayerBet(playerMap, roundPlayers.get(0));
 						// Big Complement
-						getBlindAction(BlindEnum.BIG_COMPLEMENT, roundPlayers.get(1));
+						new BigComplementAction(hand, roundPlayers.get(1)).action();
 						round.setPot(round.getPot()+roundPlayers.get(1).getAction().getBet());
 						checkPlayerBet(playerMap, roundPlayers.get(1));
 					}else {
-						getBlindAction(BlindEnum.FIRST_ROUND, roundPlayer);
+						// First Round
+						new FirstRoundAction(hand, roundPlayer).action();
 						round.setPot(round.getPot()+roundPlayer.getAction().getBet());
 						checkPlayerBet(playerMap, roundPlayer);
 					}
 				}else {
 					if(roundPlayer.getRound().getPlayerIncreasedBet() != roundPlayer) {
-						getBlindAction(BlindEnum.ROUNDS, roundPlayer);
+						// Other Rounds
+						new RoundsAction(hand, roundPlayer).action();
 						round.setPot(round.getPot()+roundPlayer.getAction().getBet());
 						checkPlayerBet(playerMap, roundPlayer);
 					}
@@ -160,157 +162,5 @@ public class BetingRules {
 		round.setRoundPlayers(roundPlayers);
 		return round;
 	}
-	
-	private void getBlindAction(BlindEnum blindEnum, RoundPlayer roundPlayer) {
-		ActionPlayer actionPlayer = null;
-		Boolean canCheck = false;
-		String msg = "b for bet | f for fold";
-		switch (blindEnum) {
-		case SMALL:
-			System.out.println();
-			System.out.println("Action by: "+roundPlayer.getHandPlayer().getTablePlayer().getPlayer().getNickname());
-			System.out.println("Small blind mandatory");
-			System.out.println("Value: "+hand.getCurrentBigBlind()/2);
-			actionPlayer = new ActionPlayer(ActionEnum.BET, hand.getCurrentBigBlind()/2);
-			roundPlayer.setAction(actionPlayer);
-			roundPlayer.getHandPlayer().getTablePlayer().setChips(roundPlayer.getHandPlayer().getTablePlayer().getChips()-hand.getCurrentBigBlind()/2);
-			roundPlayer.setTotalBet(roundPlayer.getTotalBet()+hand.getCurrentBigBlind()/2);
-			break;
-		case SMALL_COMPLEMENT:
-			System.out.println();
-			System.out.println("Action by: "+roundPlayer.getHandPlayer().getTablePlayer().getPlayer().getNickname());
-			System.out.println("Type:");
-			System.out.println(msg);
-			getPlayerAction(blindEnum, roundPlayer, false);
-			break;	
-		case BIG:
-			System.out.println();
-			System.out.println("Action by: "+roundPlayer.getHandPlayer().getTablePlayer().getPlayer().getNickname());
-			System.out.println("Big blind mandatory");
-			System.out.println("Value: "+hand.getCurrentBigBlind());
-			actionPlayer = new ActionPlayer(ActionEnum.BET, hand.getCurrentBigBlind());
-			roundPlayer.setAction(actionPlayer);
-			roundPlayer.getHandPlayer().getTablePlayer().setChips(roundPlayer.getHandPlayer().getTablePlayer().getChips()-hand.getCurrentBigBlind());
-			roundPlayer.setTotalBet(roundPlayer.getTotalBet()+hand.getCurrentBigBlind());
-			break;
-		case BIG_COMPLEMENT:
-			System.out.println();
-			System.out.println("Action by: "+roundPlayer.getHandPlayer().getTablePlayer().getPlayer().getNickname());
-			System.out.println("Type:");
-			if(roundPlayer.getRound().getCurrentBet() <= hand.getCurrentBigBlind()) {
-				canCheck = true;
-				msg = "c for check | b for bet | f for fold";
-			}
-			System.out.println(msg);
-			getPlayerAction(blindEnum, roundPlayer, canCheck);
-			break;
-		case FIRST_ROUND:
-			System.out.println();
-			System.out.println("Action by: "+roundPlayer.getHandPlayer().getTablePlayer().getPlayer().getNickname());
-			System.out.println("Type:");
-			System.out.println(msg);
-			getPlayerAction(blindEnum, roundPlayer, false);
-			break;
-		case ROUNDS:
-			System.out.println();
-			System.out.println("Action by: "+roundPlayer.getHandPlayer().getTablePlayer().getPlayer().getNickname());
-			System.out.println("Type:");
-			if(roundPlayer.getRound().getCurrentBet().equals(0.0)) {
-				canCheck = true;
-				msg = "c for check | b for bet | f for fold";
-			}
-			System.out.println(msg);
-			getPlayerAction(blindEnum, roundPlayer, canCheck);
-			break;
-		default:
-			break;
-		}
-	}
-	
-	private void getPlayerAction(BlindEnum blindEnum, RoundPlayer roundPlayer, Boolean canCheck) {
-		Boolean corretAction = false;
-		Boolean corretBet = false;
-		ActionPlayer actionPlayer = null;
-		while(!corretAction) {
-			try {
-				@SuppressWarnings("resource")
-				Scanner sc = new Scanner(System.in);
-				System.out.println("Action: ");
-				String action = sc.nextLine();
-				if(action.equals(ActionEnum.BET.getValue())) {
-					while(!corretBet) {
-						System.out.println("Pot: "+roundPlayer.getRound().getPot());
-						System.out.println("Total chips: "+roundPlayer.getHandPlayer().getTablePlayer().getChips());
-						System.out.println("Value already betted: "+roundPlayer.getHandPlayer().getTotalBet());
-						System.out.println("Value already betted in this round: "+roundPlayer.getTotalBet());
-						System.out.println("Type your bet: ");
-						Double bet = sc.nextDouble();
-						Double minimumBet = 0.0;
-						if(roundPlayer.getRound().getCurrentBet() > hand.getCurrentBigBlind()) {
-							minimumBet = roundPlayer.getRound().getCurrentBet();
-						}else {
-							minimumBet = hand.getCurrentBigBlind();
-							if(blindEnum.equals(BlindEnum.SMALL_COMPLEMENT))
-								minimumBet = hand.getCurrentBigBlind() / 2;
-						}
-						
-						if((roundPlayer.getHandPlayer().getTablePlayer().getChips() + roundPlayer.getTotalBet()) < minimumBet) {
-							if(!bet.equals(roundPlayer.getHandPlayer().getTablePlayer().getChips())) {
-								System.out.println("Minimum bet (all in): "+roundPlayer.getHandPlayer().getTablePlayer().getChips());
-							}else{
-								if(bet > roundPlayer.getRound().getCurrentBet())
-									roundPlayer.getRound().setCurrentBet(bet);
-								corretAction = true;
-							}
-						}
-						else if((roundPlayer.getTotalBet() + bet) < minimumBet)
-							System.out.println("Minimum bet: "+minimumBet);
-						else if(bet > roundPlayer.getHandPlayer().getTablePlayer().getChips())
-							System.out.println("Maximum bet (all in) : "+roundPlayer.getHandPlayer().getTablePlayer().getChips());
-						else if(blindEnum.equals(BlindEnum.BIG_COMPLEMENT) && bet < minimumBet)
-							System.out.println("Minimum bet: "+minimumBet);
-						else if(blindEnum.equals(BlindEnum.SMALL_COMPLEMENT) && bet > minimumBet && (bet - minimumBet) < hand.getCurrentBigBlind())
-							System.out.println("To increase the bet, the minimum is: "+minimumBet+"(Complement) + "+hand.getCurrentBigBlind()+"(big blind)"+
-											   "Total: "+minimumBet+hand.getCurrentBigBlind());
-						else {
-							corretAction = true;
-							corretBet = true;
-						}
-						if(corretBet) {
-							if(roundPlayer.getHandPlayer().getTablePlayer().getChips().equals(bet)) {
-								roundPlayer.setAllIn(true);
-								roundPlayer.getRound().setAllInValue(bet);
-								System.out.println("All in by "+roundPlayer.getHandPlayer().getTablePlayer().getPlayer().getNickname());
-								System.out.println("Total: "+ (roundPlayer.getTotalBet() + bet) + "chips");
-							}
-							actionPlayer = new ActionPlayer(ActionEnum.BET, bet);
-							roundPlayer.setAction(actionPlayer);
-							roundPlayer.getHandPlayer().getTablePlayer().setChips(roundPlayer.getHandPlayer().getTablePlayer().getChips()-bet);
-							roundPlayer.setTotalBet(roundPlayer.getTotalBet()+bet);
-							if(roundPlayer.getTotalBet()+bet > roundPlayer.getRound().getCurrentBet() && roundPlayer.getTotalBet()+bet > minimumBet)
-								roundPlayer.getRound().setPlayerIncreasedBet(roundPlayer);
-							roundPlayer.getRound().setCurrentBet(roundPlayer.getTotalBet());
-						}
-					}
-				}else if(action.equals(ActionEnum.FOLD.getValue())){
-					actionPlayer = new ActionPlayer(ActionEnum.FOLD, 0.0);
-					roundPlayer.setAction(actionPlayer);
-					roundPlayer.getHandPlayer().setStatus(StatusEnum.OUT);
-					corretAction = true;
-				}else if(action.equals(ActionEnum.CHECK.getValue())) {
-					if(canCheck) {
-						corretAction = true;
-					}
-				}else 
-					System.out.println("Wrong value!");
-			} catch (Exception e) {
-				corretAction = false;
-				System.out.println("PokerGameAutomator.getPlayerAction()");
-				System.err.println(e);
-				System.out.println(e.getMessage());
-				System.out.println(e.getCause());
-			} 
-		}
-		
-	}
+
 }
