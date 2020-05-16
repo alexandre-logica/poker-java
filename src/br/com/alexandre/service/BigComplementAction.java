@@ -23,8 +23,7 @@ public class BigComplementAction extends ActionPlayer{
 	}
 	
 	@Override
-	public Boolean checkAction() {
-		return null;
+	public void checkAction() {
 	}
 
 }

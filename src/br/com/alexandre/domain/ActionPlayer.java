@@ -13,6 +13,8 @@ public abstract class ActionPlayer {
 	protected RoundPlayer roundPlayer;
 	protected Boolean canCheck = false;
 	protected String msg = "b for bet | f for fold";
+	protected Double minimumBet = 0.0;
+	protected Boolean corretBet = false;
 	
 	public ActionPlayer() {
 		
@@ -47,61 +49,57 @@ public abstract class ActionPlayer {
 
 	public abstract void action();
 	
-	public abstract Boolean checkAction();
+	public abstract void checkAction();
 	
 	protected void init() {
 		System.out.println();
 		System.out.println("Action by: "+roundPlayer.getHandPlayer().getTablePlayer().getPlayer().getNickname());
 	}
 	
+	protected void setMinimumBet() {
+		if(roundPlayer.getRound().getCurrentBet() > hand.getCurrentBigBlind())
+			minimumBet = roundPlayer.getRound().getCurrentBet();
+		else 
+			minimumBet = hand.getCurrentBigBlind();
+	}
+	
+	private void checkBet(Scanner sc) {
+		System.out.println("Pot: "+hand.getPot());
+		System.out.println("Total chips: "+roundPlayer.getHandPlayer().getTablePlayer().getChips());
+		System.out.println("Value already betted: "+roundPlayer.getHandPlayer().getTotalBet());
+		System.out.println("Value already betted in this round: "+roundPlayer.getTotalBet());
+		System.out.println("Type your bet: ");
+		bet = sc.nextDouble();
+		if((roundPlayer.getHandPlayer().getTablePlayer().getChips() + roundPlayer.getTotalBet()) < minimumBet) {
+			if(!bet.equals(roundPlayer.getHandPlayer().getTablePlayer().getChips())) {
+				System.out.println("Minimum bet (all in): "+roundPlayer.getHandPlayer().getTablePlayer().getChips());
+			}else{
+				if(bet > roundPlayer.getRound().getCurrentBet())
+					roundPlayer.getRound().setCurrentBet(bet);
+			}
+		}
+		else if((roundPlayer.getTotalBet() + bet) < minimumBet) {
+			System.out.println("Minimum bet: "+minimumBet);
+		}else if(bet > roundPlayer.getHandPlayer().getTablePlayer().getChips()) {
+			System.out.println("Maximum bet (all in) : "+roundPlayer.getHandPlayer().getTablePlayer().getChips());
+		}else {
+			corretBet = true;
+			checkAction();
+		}
+	}
+	
 	protected void getPlayerAction() {
 		Boolean corretAction = false;
-		Boolean corretBet = false;
 		while(!corretAction) {
 			try {
-				@SuppressWarnings("resource")
 				Scanner sc = new Scanner(System.in);
 				System.out.println("Action: ");
 				String action = sc.nextLine();
 				if(action.equals(ActionEnum.BET.getValue())) {
 					corretAction = true;
+					setMinimumBet();
 					while(!corretBet) {
-						System.out.println("Pot: "+roundPlayer.getRound().getPot());
-						System.out.println("Total chips: "+roundPlayer.getHandPlayer().getTablePlayer().getChips());
-						System.out.println("Value already betted: "+roundPlayer.getHandPlayer().getTotalBet());
-						System.out.println("Value already betted in this round: "+roundPlayer.getTotalBet());
-						System.out.println("Type your bet: ");
-						Double bet = sc.nextDouble();
-						Double minimumBet = 0.0;
-//						if(roundPlayer.getRound().getCurrentBet() > hand.getCurrentBigBlind()) {
-//							minimumBet = roundPlayer.getRound().getCurrentBet();
-//						}else {
-//							minimumBet = hand.getCurrentBigBlind();
-//							if(blindEnum.equals(BlindEnum.SMALL_COMPLEMENT))
-//								minimumBet = hand.getCurrentBigBlind() / 2;
-//						}
-//						
-//						if((roundPlayer.getHandPlayer().getTablePlayer().getChips() + roundPlayer.getTotalBet()) < minimumBet) {
-//							if(!bet.equals(roundPlayer.getHandPlayer().getTablePlayer().getChips())) {
-//								System.out.println("Minimum bet (all in): "+roundPlayer.getHandPlayer().getTablePlayer().getChips());
-//							}else{
-//								if(bet > roundPlayer.getRound().getCurrentBet())
-//									roundPlayer.getRound().setCurrentBet(bet);
-//								corretAction = true;
-//							}
-//						}
-//						else if((roundPlayer.getTotalBet() + bet) < minimumBet)
-//							System.out.println("Minimum bet: "+minimumBet);
-//						else if(bet > roundPlayer.getHandPlayer().getTablePlayer().getChips())
-//							System.out.println("Maximum bet (all in) : "+roundPlayer.getHandPlayer().getTablePlayer().getChips());
-//						else if(blindEnum.equals(BlindEnum.BIG_COMPLEMENT) && bet < minimumBet)
-//							System.out.println("Minimum bet: "+minimumBet);
-//						else if(blindEnum.equals(BlindEnum.SMALL_COMPLEMENT) && bet > minimumBet && (bet - minimumBet) < hand.getCurrentBigBlind())
-//							System.out.println("To increase the bet, the minimum is: "+minimumBet+"(Complement) + "+hand.getCurrentBigBlind()+"(big blind)"+
-//											   "Total: "+minimumBet+hand.getCurrentBigBlind());
-//						else {
-//							corretBet = true;
-//						}
+						checkBet(sc);
 						if(corretBet) {
 							if(roundPlayer.getHandPlayer().getTablePlayer().getChips().equals(bet)) {
 								roundPlayer.setAllIn(true);
@@ -110,11 +108,10 @@ public abstract class ActionPlayer {
 								System.out.println("Total: "+ (roundPlayer.getTotalBet() + bet) + "chips");
 							}
 							actionEnum = ActionEnum.BET;
-							this.bet = (bet);
 							roundPlayer.setAction(this);
 							roundPlayer.getHandPlayer().getTablePlayer().setChips(roundPlayer.getHandPlayer().getTablePlayer().getChips()-bet);
 							roundPlayer.setTotalBet(roundPlayer.getTotalBet()+bet);
-							if(roundPlayer.getTotalBet()+bet > roundPlayer.getRound().getCurrentBet() && roundPlayer.getTotalBet()+bet > minimumBet)
+							if(roundPlayer.getTotalBet() > roundPlayer.getRound().getCurrentBet() && roundPlayer.getTotalBet()+bet > minimumBet)
 								roundPlayer.getRound().setPlayerIncreasedBet(roundPlayer);
 							roundPlayer.getRound().setCurrentBet(roundPlayer.getTotalBet());
 						}

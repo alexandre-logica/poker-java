@@ -75,16 +75,16 @@ public class ShowCards {
 	
 	public void showTableCards(Integer roundNumber) {
 		switch (roundNumber) {
-		case 2:
-			showFlop();
-			break;
-		case 3:
-			showTurn();
-			break;
-		case 4:
-			showRiver();
-		default:
-			break;
+			case 2:
+				showFlop();
+				break;
+			case 3:
+				showTurn();
+				break;
+			case 4:
+				showRiver();
+			default:
+				break;
 		}
 	}
 

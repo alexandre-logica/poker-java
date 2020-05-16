@@ -24,8 +24,7 @@ public class BigAction extends ActionPlayer{
 	}
 	
 	@Override
-	public Boolean checkAction() {
-		return null;
+	public void checkAction() {
 	}
 
 }

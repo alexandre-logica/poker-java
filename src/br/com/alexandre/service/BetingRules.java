@@ -33,8 +33,8 @@ public class BetingRules {
 		showCards = new ShowCards(hand);
 		do {
 			round = new Round(++count, hand);
-			round = runBets(round);
 			showCards.showTableCards(count);
+			round = runBets(round);
 			winner = checkWinner(round);
 		} while(!winner);
 		
@@ -106,11 +106,16 @@ public class BetingRules {
 		for(Map.Entry<Long, Double> entry : playerMap.entrySet()) {
 			bets.add(entry.getValue());
 		}
-		if(bets.size() == 1)
+		if(bets.size() == 1) {
 			return true;
-		else
+		}else {
 			return false;
+		}
 	}
+	
+	/*
+	 * private void sortRoundPlayers() { for(int i = 0; i < round) }
+	 */
 	
 	private Round runBets(Round round) {
 		List<RoundPlayer> roundPlayers = createRoundPlayers(round);
@@ -120,39 +125,46 @@ public class BetingRules {
 		while(!sameBet) {
 			++roundIteration;
 			for(RoundPlayer roundPlayer : roundPlayers) {
-				if(roundIteration.equals(1)) {
+				if(roundIteration.equals(1) && round.getNumber().equals(1)) {
 					if(roundPlayers.indexOf(roundPlayer) == 0) {
 						// Small
 						new SmallAction(hand, roundPlayer).action();
-						round.setPot(round.getPot()+roundPlayer.getAction().getBet());
+						hand.setPot(round.getPot()+roundPlayer.getAction().getBet());
 					}else if(roundPlayers.indexOf(roundPlayer) == 1){
 						// Big
 						new BigAction(hand, roundPlayer).action();
-						round.setPot(round.getPot()+roundPlayer.getAction().getBet());
+						hand.setPot(hand.getPot()+roundPlayer.getAction().getBet());
 					}else if(roundPlayers.indexOf(roundPlayer) == roundPlayers.size()-1){
 						// Last of First Round
 						new FirstRoundAction(hand, roundPlayer).action();
-						round.setPot(round.getPot()+roundPlayer.getAction().getBet());
+						hand.setPot(hand.getPot()+roundPlayer.getAction().getBet());
 						checkPlayerBet(playerMap, roundPlayer);
 						// Small Complement
 						new SmallComplementAction(hand, roundPlayers.get(0)).action();
-						round.setPot(round.getPot()+roundPlayers.get(0).getAction().getBet());
+						hand.setPot(hand.getPot()+roundPlayers.get(0).getAction().getBet());
 						checkPlayerBet(playerMap, roundPlayers.get(0));
 						// Big Complement
 						new BigComplementAction(hand, roundPlayers.get(1)).action();
-						round.setPot(round.getPot()+roundPlayers.get(1).getAction().getBet());
+						hand.setPot(hand.getPot()+roundPlayers.get(1).getAction().getBet());
 						checkPlayerBet(playerMap, roundPlayers.get(1));
 					}else {
 						// First Round
 						new FirstRoundAction(hand, roundPlayer).action();
-						round.setPot(round.getPot()+roundPlayer.getAction().getBet());
+						hand.setPot(round.getPot()+roundPlayer.getAction().getBet());
 						checkPlayerBet(playerMap, roundPlayer);
 					}
 				}else {
-					if(roundPlayer.getRound().getPlayerIncreasedBet() != roundPlayer) {
+					if(roundIteration > 1) {
+						if(roundPlayer.getRound().getPlayerIncreasedBet() != roundPlayer && roundPlayer.getRound().getPlayerIncreasedBet().getTotalBet() > roundPlayer.getTotalBet()) {
+							// Other Rounds
+							new RoundsAction(hand, roundPlayer).action();
+							hand.setPot(round.getPot()+roundPlayer.getAction().getBet());
+							checkPlayerBet(playerMap, roundPlayer);
+						}
+					}else {
 						// Other Rounds
 						new RoundsAction(hand, roundPlayer).action();
-						round.setPot(round.getPot()+roundPlayer.getAction().getBet());
+						hand.setPot(round.getPot()+roundPlayer.getAction().getBet());
 						checkPlayerBet(playerMap, roundPlayer);
 					}
 				}
