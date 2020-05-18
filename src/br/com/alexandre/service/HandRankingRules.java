@@ -84,7 +84,8 @@ public class HandRankingRules {
 				handRanking.setValue(calcValue(handRanking));
 				tripletHand = handRanking;
 			}
-		} else if (flushHand != null) {
+		} 
+		if (flushHand != null) {
 			// set FLUSH
 			handRanking = flushHand;
 			handRanking.setKickers(handRanking.getHandCards());
@@ -95,8 +96,7 @@ public class HandRankingRules {
 			handRanking = straightHand;
 			handRanking.setValue(calcValue(handRanking));
 			return handRanking;
-		}
-		if (tripletHand != null) {
+		} else if (tripletHand != null) {
 			// return THREE_OF_KIND
 			return tripletHand;
 		} else if (pairs != null && pairs.size() > 0) {

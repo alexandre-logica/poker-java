@@ -24,7 +24,7 @@ public class Hand {
 		this.winners = winners;
 		this.deck = deck;
 		this.currentBigBlind = currentBigBlind;
-		this.handPlayers = handPlayers;
+		this.pot = pot;
 	}
 	
 	public Hand(Integer number, Deck deck, Double currentBigBlind) {
@@ -93,7 +93,7 @@ public class Hand {
 	}
 
 	public void setPot(Double pot) {
-		this.pot = pot;
+		this.pot += pot;
 	}
 	
 }

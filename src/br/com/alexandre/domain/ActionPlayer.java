@@ -110,8 +110,8 @@ public abstract class ActionPlayer {
 							actionEnum = ActionEnum.BET;
 							roundPlayer.setAction(this);
 							roundPlayer.getHandPlayer().getTablePlayer().setChips(roundPlayer.getHandPlayer().getTablePlayer().getChips()-bet);
-							roundPlayer.setTotalBet(roundPlayer.getTotalBet()+bet);
-							if(roundPlayer.getTotalBet() > roundPlayer.getRound().getCurrentBet() && roundPlayer.getTotalBet()+bet > minimumBet)
+							roundPlayer.setTotalBet(bet);
+							if(roundPlayer.getTotalBet() > roundPlayer.getRound().getCurrentBet() && roundPlayer.getTotalBet() > minimumBet)
 								roundPlayer.getRound().setPlayerIncreasedBet(roundPlayer);
 							roundPlayer.getRound().setCurrentBet(roundPlayer.getTotalBet());
 						}

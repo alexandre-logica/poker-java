@@ -99,7 +99,7 @@ public class HandPlayer {
 	}
 
 	public void setTotalBet(Double totalBet) {
-		this.totalBet = totalBet;
+		this.totalBet += totalBet;
 	}
 
 	public List<Card> getPlayerHandCards() {

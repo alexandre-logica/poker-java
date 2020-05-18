@@ -13,7 +13,7 @@ public class RoundPlayer {
 	private Double totalBet;
 	
 	public RoundPlayer() {
-		
+		this.totalBet = 0.0;
 	}
 
 	public RoundPlayer(Long id, Round round, HandPlayer handPlayer, Boolean smallBlind, Boolean bigBlind,
@@ -100,8 +100,8 @@ public class RoundPlayer {
 	}
 
 	public void setTotalBet(Double totalBet) {
-		this.totalBet = totalBet;
-		handPlayer.setTotalBet(handPlayer.getTotalBet()+totalBet);
+		this.totalBet += totalBet;
+		handPlayer.setTotalBet(totalBet);
 	}
 	
 }
