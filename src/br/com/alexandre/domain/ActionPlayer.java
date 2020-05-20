@@ -77,11 +77,14 @@ public abstract class ActionPlayer {
 				if(bet > roundPlayer.getRound().getCurrentBet())
 					roundPlayer.getRound().setCurrentBet(bet);
 			}
-		}
-		else if((roundPlayer.getTotalBet() + bet) < minimumBet) {
+		}else if((roundPlayer.getTotalBet() + bet) < minimumBet) {
 			System.out.println("Minimum bet: "+minimumBet);
 		}else if(bet > roundPlayer.getHandPlayer().getTablePlayer().getChips()) {
 			System.out.println("Maximum bet (all in) : "+roundPlayer.getHandPlayer().getTablePlayer().getChips());
+		}else if((roundPlayer.getTotalBet() + bet) > minimumBet && ((roundPlayer.getTotalBet() + bet) - minimumBet) < hand.getCurrentBigBlind()
+				 && roundPlayer.getRound().getCurrentBet() >= hand.getCurrentBigBlind()) {
+			System.out.println("To increase the bet, the minimum is: "+(minimumBet-roundPlayer.getTotalBet())+"(Required) + "+hand.getCurrentBigBlind()+"(big blind)"+
+					   "Total: "+((minimumBet-roundPlayer.getTotalBet())+hand.getCurrentBigBlind()));
 		}else {
 			corretBet = true;
 			checkAction();
@@ -109,7 +112,7 @@ public abstract class ActionPlayer {
 							}
 							actionEnum = ActionEnum.BET;
 							roundPlayer.setAction(this);
-							roundPlayer.getHandPlayer().getTablePlayer().setChips(roundPlayer.getHandPlayer().getTablePlayer().getChips()-bet);
+							roundPlayer.getHandPlayer().getTablePlayer().decreaseChips(bet);;
 							roundPlayer.setTotalBet(bet);
 							if(roundPlayer.getTotalBet() > roundPlayer.getRound().getCurrentBet() && roundPlayer.getTotalBet() > minimumBet)
 								roundPlayer.getRound().setPlayerIncreasedBet(roundPlayer);

@@ -56,6 +56,14 @@ public class TablePlayer implements Comparable<TablePlayer> {
 	public void setChips(Double chips) {
 		this.chips = chips;
 	}
+	
+	public void increaseChips(Double chips) {
+		this.chips += chips;
+	}
+	
+	public void decreaseChips(Double chips) {
+		this.chips -= chips;
+	}
 
 	@Override
 	public int compareTo(TablePlayer o) {

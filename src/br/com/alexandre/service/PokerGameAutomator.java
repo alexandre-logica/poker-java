@@ -33,7 +33,7 @@ public class PokerGameAutomator {
 		table.setTablePlayers(createTablePlayers());
 		while (!table.getGameOver()) {
 			table.getHands().add(runHand(++count));
-			table.setGameOver(true);
+			table.setGameOver(checkGameOver());
 		}
 	}
 	
@@ -56,10 +56,23 @@ public class PokerGameAutomator {
 		List<TablePlayer> tablePlayers = new ArrayList<TablePlayer>();
 		Collections.shuffle(players);
 		for (int i = 0; i < players.size(); i++) {
-			tablePlayers.add(new TablePlayer(table, players.get(i), i, false, table.getInitialChipsPlayers()));
+			tablePlayers.add(new TablePlayer(table, players.get(i), i+1, false, table.getInitialChipsPlayers()));
 		}
 		tablePlayers.get(tablePlayers.size()-1).setDealer(true);
 		return tablePlayers;
+	}
+	
+	private Boolean checkGameOver() {
+		int playerOverAmount = 0;
+		for(TablePlayer player : table.getTablePlayers()) {
+			if(player.getChips().equals(0.0)) {
+				playerOverAmount++;
+			}
+		}
+		if((table.getTablePlayers().size() - playerOverAmount) == 1)
+			return true;
+		else
+			return false;
 	}
 	
 	private void giveOutCards(Hand hand) {
@@ -80,14 +93,16 @@ public class PokerGameAutomator {
 			hand.getHandCards().add(handcard);
 		}
 		for (int x = 0; x < table.getTablePlayers().size(); x++) {
-			handPlayer = new HandPlayer(new Long(x), hand, table.getTablePlayers().get(x));
-			for (int i = 0; i < 2; i++) {
-				handPlayer.getCards().add(hand.getDeck().getFULLDECK().get(0));
-				hand.getDeck().getFULLDECK().remove(0);
+			if(table.getTablePlayers().get(x).getChips() > 0.0) {
+				handPlayer = new HandPlayer(new Long(x), hand, table.getTablePlayers().get(x));
+				for (int i = 0; i < 2; i++) {
+					handPlayer.getCards().add(hand.getDeck().getFULLDECK().get(0));
+					hand.getDeck().getFULLDECK().remove(0);
+				}
+				handPlayer.getPlayerHandCards().addAll(handPlayer.getCards());
+				handPlayer.getPlayerHandCards().addAll(handCards);
+				hand.getHandPlayers().add(handPlayer);
 			}
-			handPlayer.getPlayerHandCards().addAll(handPlayer.getCards());
-			handPlayer.getPlayerHandCards().addAll(handCards);
-			hand.getHandPlayers().add(handPlayer);
 		}
 	}
 

@@ -37,13 +37,13 @@ public class BetingRules {
 			round = runBets(round);
 			winner = checkWinner(round);
 		} while(!winner);
-		
 		return round.getHand().getWinners();
 	}
 	
 	private Boolean checkWinner(Round round) {
 		if(round.getRoundPlayers().size() == 1) {
 			round.setWinner(true);
+			round.getRoundPlayers().get(0).getHandPlayer().getTablePlayer().increaseChips(round.getHand().getPot());
 			round.getHand().getWinners().add(round.getRoundPlayers().get(0).getHandPlayer());
 		}else if(round.getNumber().equals(4) || round.getAllIn()) {
 			round.setWinner(true);
@@ -54,12 +54,12 @@ public class BetingRules {
 				handRanking.setHandPlayer(player.getHandPlayer());
 				handRankings.add(handRanking);
 			}
-			round.getHand().setWinners(checkMultipleWinners(hand, handRankings));
+			round.getHand().setWinners(checkMultipleWinners(handRankings));
 		}
 		return round.getWinner();
 	}
 	
-	private List<HandPlayer> checkMultipleWinners(Hand hand, List<HandRanking> handRankings){
+	private List<HandPlayer> checkMultipleWinners(List<HandRanking> handRankings){
 		List<HandPlayer> winners = new ArrayList<>();
 		Collections.sort(handRankings, Collections.reverseOrder());
 		if(handRankings.get(0).getValue().equals(handRankings.get(1).getValue())) {
@@ -70,8 +70,12 @@ public class BetingRules {
 					winners.add(handRankings.get(i).getHandPlayer());
 				}
 			}
+			for(HandPlayer player : winners) {
+				player.getTablePlayer().increaseChips(hand.getPot()/winners.size());
+			}
 		}else {
 			handRankings.get(0).getHandPlayer().setHandRanking(handRankings.get(0));
+			handRankings.get(0).getHandPlayer().getTablePlayer().increaseChips(hand.getPot());
 			winners.add(handRankings.get(0).getHandPlayer());
 		}
 		return winners;
@@ -112,10 +116,6 @@ public class BetingRules {
 			return false;
 		}
 	}
-	
-	/*
-	 * private void sortRoundPlayers() { for(int i = 0; i < round) }
-	 */
 	
 	private Round runBets(Round round) {
 		List<RoundPlayer> roundPlayers = createRoundPlayers(round);
