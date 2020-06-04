@@ -16,7 +16,8 @@ public class RoundsAction extends ActionPlayer{
 		System.out.println("Type:");
 		if(roundPlayer.getRound().getCurrentBet().equals(0.0)) {
 			canCheck = true;
-			msg = "c for check | b for bet | f for fold";
+			canFold = false;
+			msg = "c for check | b for bet";
 		}
 		System.out.println(msg);
 		getPlayerAction();

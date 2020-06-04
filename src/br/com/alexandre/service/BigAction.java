@@ -21,6 +21,7 @@ public class BigAction extends ActionPlayer{
 		roundPlayer.setAction(this);
 		roundPlayer.getHandPlayer().getTablePlayer().setChips(roundPlayer.getHandPlayer().getTablePlayer().getChips()-hand.getCurrentBigBlind());
 		roundPlayer.setTotalBet(roundPlayer.getTotalBet()+hand.getCurrentBigBlind());
+		hand.setPot(bet);
 	}
 	
 	@Override

@@ -7,31 +7,25 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.SortedSet;
-import java.util.TreeSet;
 
 public class Util {
 
 	public static Map<Integer, Long> sortByValueInteger(Map<Integer, Long> hm) { 
         // Create a list from elements of HashMap 
         List<Map.Entry<Integer, Long> > list = new LinkedList<Map.Entry<Integer, Long> >(hm.entrySet()); 
-  
         // Sort the list 
         Collections.sort(list, new Comparator<Map.Entry<Integer, Long> >() { 
             public int compare(Map.Entry<Integer, Long> o1,  
                                Map.Entry<Integer, Long> o2) 
             { 
-            	
             	int sComp = o2.getValue().compareTo(o1.getValue()); 
                 if (sComp != 0) {
                     return sComp;
                  } 
-                
                 return o2.getKey().compareTo(o1.getKey());
             } 
         }); 
-          
         // put data from sorted list to hashmap  
         Map<Integer, Long> temp = new LinkedHashMap<Integer, Long>(); 
         for (Map.Entry<Integer, Long> aa : list) { 
@@ -43,7 +37,6 @@ public class Util {
 	public static Map<String, Long> sortByValueString(Map<String, Long> hm) { 
         // Create a list from elements of HashMap 
         List<Map.Entry<String, Long> > list = new LinkedList<Map.Entry<String, Long> >(hm.entrySet()); 
-  
         // Sort the list 
         Collections.sort(list, new Comparator<Map.Entry<String, Long> >() { 
             public int compare(Map.Entry<String, Long> o1,  
@@ -52,7 +45,6 @@ public class Util {
                 return (o1.getValue()).compareTo(o2.getValue()); 
             } 
         }); 
-          
         // put data from sorted list to hashmap  
         Map<String, Long> temp = new LinkedHashMap<String, Long>(); 
         for (Map.Entry<String, Long> aa : list) { 

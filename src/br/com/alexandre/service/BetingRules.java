@@ -41,6 +41,7 @@ public class BetingRules {
 	}
 	
 	private Boolean checkWinner(Round round) {
+		round.getRoundPlayers().removeIf(p -> (p.getHandPlayer().getStatus().equals(StatusEnum.OUT)));
 		if(round.getRoundPlayers().size() == 1) {
 			round.setWinner(true);
 			round.getRoundPlayers().get(0).getHandPlayer().getTablePlayer().increaseChips(round.getHand().getPot());
@@ -129,28 +130,22 @@ public class BetingRules {
 					if(roundPlayers.indexOf(roundPlayer) == 0) {
 						// Small
 						new SmallAction(hand, roundPlayer).action();
-						hand.setPot(roundPlayer.getAction().getBet());
 					}else if(roundPlayers.indexOf(roundPlayer) == 1){
 						// Big
 						new BigAction(hand, roundPlayer).action();
-						hand.setPot(roundPlayer.getAction().getBet());
 					}else if(roundPlayers.indexOf(roundPlayer) == roundPlayers.size()-1){
 						// Last of First Round
 						new FirstRoundAction(hand, roundPlayer).action();
-						hand.setPot(roundPlayer.getAction().getBet());
 						checkPlayerBet(playerMap, roundPlayer);
 						// Small Complement
 						new SmallComplementAction(hand, roundPlayers.get(0)).action();
-						hand.setPot(roundPlayers.get(0).getAction().getBet());
 						checkPlayerBet(playerMap, roundPlayers.get(0));
 						// Big Complement
 						new BigComplementAction(hand, roundPlayers.get(1)).action();
-						hand.setPot(roundPlayers.get(1).getAction().getBet());
 						checkPlayerBet(playerMap, roundPlayers.get(1));
 					}else {
 						// First Round
 						new FirstRoundAction(hand, roundPlayer).action();
-						hand.setPot(roundPlayer.getAction().getBet());
 						checkPlayerBet(playerMap, roundPlayer);
 					}
 				}else {
@@ -158,13 +153,11 @@ public class BetingRules {
 						if(roundPlayer.getRound().getPlayerIncreasedBet() != roundPlayer && roundPlayer.getRound().getPlayerIncreasedBet().getTotalBet() > roundPlayer.getTotalBet()) {
 							// Other Rounds
 							new RoundsAction(hand, roundPlayer).action();
-							hand.setPot(roundPlayer.getAction().getBet());
 							checkPlayerBet(playerMap, roundPlayer);
 						}
 					}else {
 						// Other Rounds
 						new RoundsAction(hand, roundPlayer).action();
-						hand.setPot(roundPlayer.getAction().getBet());
 						checkPlayerBet(playerMap, roundPlayer);
 					}
 				}

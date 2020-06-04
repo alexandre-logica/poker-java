@@ -21,6 +21,7 @@ public class SmallAction extends ActionPlayer{
 		roundPlayer.setAction(this);
 		roundPlayer.getHandPlayer().getTablePlayer().setChips(roundPlayer.getHandPlayer().getTablePlayer().getChips()-hand.getCurrentBigBlind()/2);
 		roundPlayer.setTotalBet(roundPlayer.getTotalBet()+hand.getCurrentBigBlind()/2);
+		hand.setPot(bet);
 	}
 	
 	@Override

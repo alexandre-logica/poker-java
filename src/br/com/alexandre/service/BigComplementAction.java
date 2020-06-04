@@ -12,14 +12,17 @@ public class BigComplementAction extends ActionPlayer{
 
 	@Override
 	public void action() {
-		init();
-		System.out.println("Type:");
-		if(roundPlayer.getRound().getCurrentBet() <= hand.getCurrentBigBlind()) {
-			canCheck = true;
-			msg = "c for check | b for bet | f for fold";
+		if(!roundPlayer.getRound().getCurrentBet().equals(0.0)) {
+			init();
+			System.out.println("Type:");
+			if(roundPlayer.getRound().getCurrentBet().equals(hand.getCurrentBigBlind())) {
+				canCheck = true;
+				canFold = false;
+				msg = "c for check | b for bet";
+			}
+			System.out.println(msg);
+			getPlayerAction();
 		}
-		System.out.println(msg);
-		getPlayerAction();
 	}
 	
 	@Override

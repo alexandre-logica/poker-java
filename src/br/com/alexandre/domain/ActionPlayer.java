@@ -12,6 +12,7 @@ public abstract class ActionPlayer {
 	protected Hand hand;
 	protected RoundPlayer roundPlayer;
 	protected Boolean canCheck = false;
+	protected Boolean canFold = true;
 	protected String msg = "b for bet | f for fold";
 	protected Double minimumBet = 0.0;
 	protected Boolean corretBet = false;
@@ -117,14 +118,17 @@ public abstract class ActionPlayer {
 							if(roundPlayer.getTotalBet() > roundPlayer.getRound().getCurrentBet() && roundPlayer.getTotalBet() > minimumBet)
 								roundPlayer.getRound().setPlayerIncreasedBet(roundPlayer);
 							roundPlayer.getRound().setCurrentBet(roundPlayer.getTotalBet());
+							hand.setPot(bet);
 						}
 					}
 				}else if(action.equals(ActionEnum.FOLD.getValue())){
-					this.actionEnum = ActionEnum.FOLD;
-					this.bet = (0.0);
-					roundPlayer.setAction(this);
-					roundPlayer.getHandPlayer().setStatus(StatusEnum.OUT);
-					corretAction = true;
+					if(canFold) {
+						this.actionEnum = ActionEnum.FOLD;
+						this.bet = (0.0);
+						roundPlayer.setAction(this);
+						roundPlayer.getHandPlayer().setStatus(StatusEnum.OUT);
+						corretAction = true;
+					}
 				}else if(action.equals(ActionEnum.CHECK.getValue())) {
 					if(canCheck) {
 						corretAction = true;
