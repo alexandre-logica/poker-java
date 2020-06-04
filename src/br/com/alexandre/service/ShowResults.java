@@ -4,13 +4,15 @@ import br.com.alexandre.domain.Card;
 import br.com.alexandre.domain.Hand;
 import br.com.alexandre.domain.HandCard;
 import br.com.alexandre.domain.HandPlayer;
+import br.com.alexandre.domain.Table;
+import br.com.alexandre.enuns.StatusEnum;
 import br.com.alexandre.enuns.TypeCardEnum;
 
-public class ShowCards {
+public class ShowResults {
 
 	private Hand hand;
 	
-	public ShowCards(Hand hand) {
+	public ShowResults(Hand hand) {
 		super();
 		this.hand = hand;
 	}
@@ -109,26 +111,40 @@ public class ShowCards {
 			System.out.println();
 	}
 	
-	public void showWinners() {
+	public void showHandWinners() {
 		System.out.println();
 		if(hand.getWinners().size() > 1)
-			System.out.println("************** Winners **************");
+			System.out.println("************** Hand Winners **************");
 		else
-			System.out.println("************** Winner **************");
+			System.out.println("************** Hand Winner **************");
 		System.out.println();
 		for (HandPlayer player : hand.getWinners()) {
 			System.out.println("Player: " + player.getTablePlayer().getPlayer().getNickname());
 			System.out.println("Pot: " + (hand.getPot() / hand.getWinners().size()));
-			System.out.println("Hand game: " + player.getHandRanking().getType().getName());
-			System.out.println("Score: " + player.getHandRanking().getValue());
-			showPlayerCards(player);
-			showHandCards();
-			System.out.println();
-			System.out.println("************** Winner hand cards **************");
-			System.out.println();
-			showPlayerHandCards(player);
+			if(player.getStatus().equals(StatusEnum.CARD_WINNER)) {
+				System.out.println("Hand game: " + player.getHandRanking().getType().getName());
+				System.out.println("Score: " + player.getHandRanking().getValue());
+				showPlayerCards(player);
+				showHandCards();
+				System.out.println();
+				System.out.println("************** Winner hand cards **************");
+				System.out.println();
+				showPlayerHandCards(player);
+			}else {
+				System.out.println("All the other players fold");
+			}
 			System.out.println();
 		}
+	}
+	
+	public void showWinner(Table table) {
+		System.out.println();
+		System.out.println("************** Winner **************");
+		System.out.println();
+		System.out.println("Player: " + table.getTablePlayers().get(0).getPlayer().getNickname());
+		System.out.println();
+		System.out.println("Player total prize: " + table.getTablePlayers().get(0).getChips());
+		System.out.println();
 	}
 	
 	private void showPlayerHandCards(HandPlayer player) {

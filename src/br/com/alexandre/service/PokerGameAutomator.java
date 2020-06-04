@@ -21,7 +21,7 @@ public class PokerGameAutomator {
 	private Deck deck;
 	private List<Card> handCards;
 	private BetingRules betingRules;
-	private ShowCards showCards;
+	private ShowResults showResults;
 	
 	public PokerGameAutomator(Table table, List<Player> players) {
 		this.table = table;
@@ -35,20 +35,21 @@ public class PokerGameAutomator {
 			table.getHands().add(runHand(++count));
 			table.setGameOver(checkGameOver());
 		}
+		showResults = new ShowResults(table.getHands().get(table.getHands().size()-1));
+		showResults.showWinner(table);
 	}
 	
 	private Hand runHand(Integer count) {
 		deck = new Deck();
 		deck.shuffle();
 		Hand hand = new Hand(count, deck, table.getCurrentBigBlind());
-		showCards = new ShowCards(hand);
-		showCards.showDeck();
+		showResults = new ShowResults(hand);
 		giveOutCards(hand);
-		showCards.showPlayerCards();
+		showResults.showPlayerCards();
 		betingRules = new BetingRules(hand);
 		hand.setWinners(betingRules.runRounds());
-		showCards = new ShowCards(hand);
-		showCards.showWinners();
+		showResults = new ShowResults(hand);
+		showResults.showHandWinners();
 		return hand;
 	}
 	
@@ -63,13 +64,8 @@ public class PokerGameAutomator {
 	}
 	
 	private Boolean checkGameOver() {
-		int playerOverAmount = 0;
-		for(TablePlayer player : table.getTablePlayers()) {
-			if(player.getChips().equals(0.0)) {
-				playerOverAmount++;
-			}
-		}
-		if((table.getTablePlayers().size() - playerOverAmount) == 1)
+		table.getTablePlayers().removeIf(p -> (p.getChips().equals(0.0)));
+		if(table.getTablePlayers().size() == 1)
 			return true;
 		else
 			return false;

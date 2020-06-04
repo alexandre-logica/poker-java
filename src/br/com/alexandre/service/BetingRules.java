@@ -19,7 +19,7 @@ import br.com.alexandre.enuns.StatusEnum;
 public class BetingRules {
 
 	private Hand hand;
-	private ShowCards showCards;
+	private ShowResults showResults;
 	private HandRankingRules handRankingHules;
 	
 	public BetingRules(Hand hand) {
@@ -29,25 +29,26 @@ public class BetingRules {
 	public List<HandPlayer> runRounds() {
 		Round round;
 		Integer count = 0;
-		Boolean winner = false;
-		showCards = new ShowCards(hand);
+		Boolean handWinner = false;
+		showResults = new ShowResults(hand);
 		do {
 			round = new Round(++count, hand);
-			showCards.showTableCards(count);
+			showResults.showTableCards(count);
 			round = runBets(round);
-			winner = checkWinner(round);
-		} while(!winner);
+			handWinner = checkHandWinner(round);
+		} while(!handWinner);
 		return round.getHand().getWinners();
 	}
 	
-	private Boolean checkWinner(Round round) {
+	private Boolean checkHandWinner(Round round) {
 		round.getRoundPlayers().removeIf(p -> (p.getHandPlayer().getStatus().equals(StatusEnum.OUT)));
 		if(round.getRoundPlayers().size() == 1) {
-			round.setWinner(true);
+			round.sethandWinner(true);
 			round.getRoundPlayers().get(0).getHandPlayer().getTablePlayer().increaseChips(round.getHand().getPot());
+			round.getRoundPlayers().get(0).getHandPlayer().setStatus(StatusEnum.BETING_WINNER);
 			round.getHand().getWinners().add(round.getRoundPlayers().get(0).getHandPlayer());
 		}else if(round.getNumber().equals(4) || round.getAllIn()) {
-			round.setWinner(true);
+			round.sethandWinner(true);
 			handRankingHules = new HandRankingRules();
 			List<HandRanking> handRankings = new ArrayList<>();
 			for(RoundPlayer player : round.getRoundPlayers()) {
@@ -57,7 +58,7 @@ public class BetingRules {
 			}
 			round.getHand().setWinners(checkMultipleWinners(handRankings));
 		}
-		return round.getWinner();
+		return round.gethandWinner();
 	}
 	
 	private List<HandPlayer> checkMultipleWinners(List<HandRanking> handRankings){
@@ -68,6 +69,7 @@ public class BetingRules {
 			for(int i = 0; i < handRankings.size(); i++) {
 				if(handRankings.get(i).getValue().equals(value)) {
 					handRankings.get(i).getHandPlayer().setHandRanking(handRankings.get(i));
+					handRankings.get(i).getHandPlayer().setStatus(StatusEnum.CARD_WINNER);
 					winners.add(handRankings.get(i).getHandPlayer());
 				}
 			}
@@ -76,6 +78,7 @@ public class BetingRules {
 			}
 		}else {
 			handRankings.get(0).getHandPlayer().setHandRanking(handRankings.get(0));
+			handRankings.get(0).getHandPlayer().setStatus(StatusEnum.CARD_WINNER);
 			handRankings.get(0).getHandPlayer().getTablePlayer().increaseChips(hand.getPot());
 			winners.add(handRankings.get(0).getHandPlayer());
 		}
