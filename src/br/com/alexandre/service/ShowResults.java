@@ -97,7 +97,8 @@ public class ShowResults {
 		for (HandPlayer player : hand.getHandPlayers()) {
 			System.out.println("Player: " + player.getTablePlayer().getPlayer().getNickname());
 			System.out.println("Position: " + player.getTablePlayer().getPosition());
-			if(player.getTablePlayer().getDealer())
+			System.out.println("Chips: " + player.getTablePlayer().getChips());
+			if(player.getDealer())
 				System.out.println("Dealer");
 			System.out.print("Cards: | " + player.getCards().get(0).getCharacter() + "-" + player.getCards().get(0).getSymbol());
 			System.out.println(" | " + player.getCards().get(1).getCharacter() + "-" + player.getCards().get(1).getSymbol() + " | ");
