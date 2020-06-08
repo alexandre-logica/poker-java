@@ -131,6 +131,9 @@ public abstract class ActionPlayer {
 					}
 				}else if(action.equals(ActionEnum.CHECK.getValue())) {
 					if(canCheck) {
+						this.actionEnum = ActionEnum.CHECK;
+						this.bet = (0.0);
+						roundPlayer.setAction(this);
 						corretAction = true;
 					}
 				}else 

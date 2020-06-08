@@ -114,7 +114,7 @@ public class BetingRules {
 		for(Map.Entry<Long, Double> entry : playerMap.entrySet()) {
 			bets.add(entry.getValue());
 		}
-		if(bets.size() == 1) {
+		if(bets.size() <= 1) {
 			return true;
 		}else {
 			return false;

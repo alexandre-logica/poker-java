@@ -24,6 +24,7 @@ public class ShowResults {
 		for (Card card : hand.getDeck().getFULLDECK()) {
 			System.out.println(card.getCharacter() + "-" + card.getSymbol());
 		}
+		System.out.println();
 	}
 
 	public void showHandCards() {
@@ -31,6 +32,7 @@ public class ShowResults {
 		System.out.println("*************** Table Cards ***************");
 		System.out.println();
 		System.out.println("##### Flop #####");
+		System.out.println();
 		for (HandCard card : hand.getHandCards()) {
 			if (card.getType().equals(TypeCardEnum.FLOP.getValue())) {
 				System.out.println(card.getCard().getCharacter() + "-" + card.getCard().getSymbol());
@@ -43,6 +45,7 @@ public class ShowResults {
 				System.out.println(card.getCard().getCharacter() + "-" + card.getCard().getSymbol());
 			}
 		}
+		System.out.println();
 	}
 	
 	public void showFlop() {
@@ -50,27 +53,33 @@ public class ShowResults {
 		System.out.println("*************** Table Cards ***************");
 		System.out.println();
 		System.out.println("##### Flop #####");
+		System.out.println();
 		for (HandCard card : hand.getHandCards()) {
 			if (card.getType().equals(TypeCardEnum.FLOP.getValue())) {
 				System.out.println(card.getCard().getCharacter() + "-" + card.getCard().getSymbol());
 			}
 		}
+		System.out.println();
 	}
 	
 	public void showTurn() {
 		for (HandCard card : hand.getHandCards()) {
 			if (card.getType().equals(TypeCardEnum.TURN.getValue())) {
+				System.out.println();
 				System.out.println("##### Turn #####");
 				System.out.println(card.getCard().getCharacter() + "-" + card.getCard().getSymbol());
+				System.out.println();
 			} 
 		}
 	}
 	
 	public void showRiver() {
 		for (HandCard card : hand.getHandCards()) {
-		if (card.getType().equals(TypeCardEnum.RIVER.getValue())) {
+			if (card.getType().equals(TypeCardEnum.RIVER.getValue())) {
+				System.out.println();
 				System.out.println("##### River #####");
 				System.out.println(card.getCard().getCharacter() + "-" + card.getCard().getSymbol());
+				System.out.println();
 			}
 		}
 	}
@@ -104,12 +113,14 @@ public class ShowResults {
 			System.out.println(" | " + player.getCards().get(1).getCharacter() + "-" + player.getCards().get(1).getSymbol() + " | ");
 			System.out.println();
 		}
+		System.out.println();
 	}
 
 	public void showPlayerCards(HandPlayer player) {
-			System.out.print("Player cards: | " + player.getCards().get(0).getCharacter() + "-" + player.getCards().get(0).getSymbol());
-			System.out.println(" | " + player.getCards().get(1).getCharacter() + "-" + player.getCards().get(1).getSymbol() + " | ");
-			System.out.println();
+		System.out.println();
+		System.out.print("Player cards: | " + player.getCards().get(0).getCharacter() + "-" + player.getCards().get(0).getSymbol());
+		System.out.println(" | " + player.getCards().get(1).getCharacter() + "-" + player.getCards().get(1).getSymbol() + " | ");
+		System.out.println();
 	}
 	
 	public void showHandWinners() {
@@ -149,9 +160,11 @@ public class ShowResults {
 	}
 	
 	private void showPlayerHandCards(HandPlayer player) {
+		System.out.println();
 		for(Card card : player.getHandRanking().getHandCards()) {
 			System.out.print(" | " + card.getCharacter() + "-" + card.getSymbol() + " | ");
 		}
+		System.out.println();
 	}
 
 	public void showCards() {
