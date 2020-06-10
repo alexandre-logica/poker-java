@@ -7,7 +7,8 @@ public enum BlindEnum {
 	BIG("BG"),
 	BIG_COMPLEMENT("BC"),
 	FIRST_ROUND("FR"),
-	ROUNDS("RS");
+	ROUNDS("RS"),
+	DEALER("DL");
 	
 	private String value;
 	

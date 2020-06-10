@@ -12,6 +12,7 @@ import br.com.alexandre.domain.HandPlayer;
 import br.com.alexandre.domain.Player;
 import br.com.alexandre.domain.Table;
 import br.com.alexandre.domain.TablePlayer;
+import br.com.alexandre.enuns.BlindEnum;
 import br.com.alexandre.enuns.TypeCardEnum;
 
 public class PokerGameAutomator {
@@ -79,16 +80,16 @@ public class PokerGameAutomator {
 			HandPlayer handPlayer = new HandPlayer(new Long(tablePlayer.getDealerPosition()), hand, tablePlayer);
 			switch (tablePlayer.getDealerPosition()) {
 				case 1:
-					handPlayer.setSmall(true);
+					handPlayer.setBlind(BlindEnum.SMALL);;
 					break;
 				case 2:
-					handPlayer.setBig(true);
+					handPlayer.setBlind(BlindEnum.BIG);
 					break;
 				default:
 					break;
 			}
 			if(tablePlayer.getDealerPosition().equals(table.getTablePlayers().size()))
-				handPlayer.setDealer(true);
+				handPlayer.setBlind(BlindEnum.DEALER);;
 			handPlayers.add(handPlayer);
 		}
 		return handPlayers;

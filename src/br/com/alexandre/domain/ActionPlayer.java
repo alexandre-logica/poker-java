@@ -80,12 +80,18 @@ public abstract class ActionPlayer {
 			System.out.println("Minimum bet: "+(minimumBet - roundPlayer.getTotalBet()));
 		}else if(bet > roundPlayer.getHandPlayer().getTablePlayer().getChips()) {
 			System.out.println("Maximum bet (all in) : "+roundPlayer.getHandPlayer().getTablePlayer().getChips());
-		}else if((roundPlayer.getTotalBet() + bet) > minimumBet && (roundPlayer.getTotalBet() + bet) < (minimumBet * 2)
-				 && (roundPlayer.getHandPlayer().getTablePlayer().getChips() + roundPlayer.getTotalBet()) >= (minimumBet * 2)) {
-			System.out.println("To increase the bet, the minimum is: "+((minimumBet * 2) - roundPlayer.getTotalBet()));
+		}else if((roundPlayer.getTotalBet() + bet) > minimumBet && (roundPlayer.getTotalBet() + bet) < (minimumBet * 2)) {
+			if((roundPlayer.getHandPlayer().getTablePlayer().getChips() + roundPlayer.getTotalBet()) >= (minimumBet * 2)) {
+				System.out.println("To increase the bet, the minimum is: "+((minimumBet * 2) - roundPlayer.getTotalBet()));
+			} else if(bet < roundPlayer.getHandPlayer().getTablePlayer().getChips()) {
+				System.out.println("To increase the bet, the minimum is (All in): "+ roundPlayer.getHandPlayer().getTablePlayer().getChips());
+			}else {
+				corretBet = true;
+				//checkAction();
+			}
 		}else {
 			corretBet = true;
-			checkAction();
+			//checkAction();
 		}
 	}
 	
@@ -120,18 +126,18 @@ public abstract class ActionPlayer {
 					}
 				}else if(action.equals(ActionEnum.FOLD.getValue())){
 					if(canFold) {
+						corretAction = true;
 						this.actionEnum = ActionEnum.FOLD;
 						this.bet = (0.0);
 						roundPlayer.setAction(this);
 						roundPlayer.getHandPlayer().setStatus(StatusEnum.OUT);
-						corretAction = true;
 					}
 				}else if(action.equals(ActionEnum.CHECK.getValue())) {
 					if(canCheck) {
+						corretAction = true;
 						this.actionEnum = ActionEnum.CHECK;
 						this.bet = (0.0);
 						roundPlayer.setAction(this);
-						corretAction = true;
 					}
 				}else 
 					System.out.println("Wrong value!");

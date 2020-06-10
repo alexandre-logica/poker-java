@@ -14,6 +14,7 @@ import br.com.alexandre.domain.HandRanking;
 import br.com.alexandre.domain.Round;
 import br.com.alexandre.domain.RoundPlayer;
 import br.com.alexandre.enuns.ActionEnum;
+import br.com.alexandre.enuns.BlindEnum;
 import br.com.alexandre.enuns.StatusEnum;
 
 public class BettingRules {
@@ -91,11 +92,15 @@ public class BettingRules {
 		Long id = 0L;
 		for (HandPlayer handPlayer : round.getHand().getHandPlayers()) {
 			if(handPlayer.getStatus().equals(StatusEnum.IN)) {
-				roundPlayer = new RoundPlayer();
-				roundPlayer.setId(++id);
-				roundPlayer.setRound(round);
-				roundPlayer.setHandPlayer(handPlayer);
-				roundPlayer.setTotalBet(0.0);
+				roundPlayer = new RoundPlayer(++id, round, handPlayer, 0.0);
+				if(round.getNumber().equals(1)) {
+					roundPlayer.setBlind(handPlayer.getBlind());
+				}else {
+					if(handPlayer.getBlind().equals(BlindEnum.DEALER))
+						roundPlayer.setBlind(handPlayer.getBlind());
+					else
+						roundPlayer.setBlind(BlindEnum.ROUNDS);
+				}
 				roundPlayers.add(roundPlayer);
 			}
 		}
@@ -153,11 +158,6 @@ public class BettingRules {
 					}
 				}else {
 					if(roundIteration > 1) {
-//						if(roundPlayer.getRound().getPlayerIncreasedBet() != roundPlayer && roundPlayer.getRound().getPlayerIncreasedBet().getTotalBet() > roundPlayer.getTotalBet()) {
-//							// Other Rounds
-//							new RoundsAction(hand, roundPlayer).action();
-//							checkPlayerBet(playerMap, roundPlayer);
-//						}
 						if(roundPlayer.getTotalBet() < roundPlayer.getRound().getCurrentBet() && !roundPlayer.getAction().getActionEnum().equals(ActionEnum.FOLD)) {
 							// Other Rounds
 							new RoundsAction(hand, roundPlayer).action();

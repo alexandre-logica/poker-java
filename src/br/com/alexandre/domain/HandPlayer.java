@@ -3,6 +3,7 @@ package br.com.alexandre.domain;
 import java.util.ArrayList;
 import java.util.List;
 
+import br.com.alexandre.enuns.BlindEnum;
 import br.com.alexandre.enuns.StatusEnum;
 
 public class HandPlayer {
@@ -16,17 +17,14 @@ public class HandPlayer {
 	private HandRanking handRanking;
 	private Double totalBet;
 	private List<Card> playerHandCards;
-	private Boolean dealer;
-	private Boolean small;
-	private Boolean big;
+	private BlindEnum blind;
 	
 	public HandPlayer() {
 		
 	}
 	
 	public HandPlayer(Long id, Hand hand, TablePlayer tablePlayer, List<Card> cards, StatusEnum status, Boolean winner,
-					  HandRanking handRanking, Double totalBet, List<Card> playerHandCards, Boolean dealer,
-					  Boolean small, Boolean big) {
+					  HandRanking handRanking, Double totalBet, List<Card> playerHandCards, BlindEnum blind) {
 		super();
 		this.id = id;
 		this.hand = hand;
@@ -37,14 +35,12 @@ public class HandPlayer {
 		this.handRanking = handRanking;
 		this.totalBet = totalBet;
 		this.playerHandCards = playerHandCards;
-		this.dealer = dealer;
-		this.small = small;
-		this.big = big;
+		this.blind = blind;
 	}
 	
 	public HandPlayer(Long id, Hand hand, TablePlayer tablePlayer) {
 		this(id, hand, tablePlayer, new ArrayList<Card>(), StatusEnum.IN, false, new HandRanking(),
-			 0.0, new ArrayList<Card>(), false, false, false);
+			 0.0, new ArrayList<Card>(), BlindEnum.FIRST_ROUND);
 	}
 	
 	public Long getId() {
@@ -119,28 +115,12 @@ public class HandPlayer {
 		this.playerHandCards = playerHandCards;
 	}
 
-	public Boolean getDealer() {
-		return dealer;
+	public BlindEnum getBlind() {
+		return blind;
 	}
 
-	public void setDealer(Boolean dealer) {
-		this.dealer = dealer;
-	}
-
-	public Boolean getSmall() {
-		return small;
-	}
-
-	public void setSmall(Boolean small) {
-		this.small = small;
-	}
-
-	public Boolean getBig() {
-		return big;
-	}
-
-	public void setBig(Boolean big) {
-		this.big = big;
+	public void setBlind(BlindEnum blind) {
+		this.blind = blind;
 	}
 	
 }

@@ -1,13 +1,13 @@
 package br.com.alexandre.domain;
 
+import br.com.alexandre.enuns.BlindEnum;
+
 public class RoundPlayer {
 
 	private Long id;
 	private Round round;
 	private HandPlayer handPlayer;
-	private Boolean smallBlind;
-	private Boolean bigBlind;
-	private Boolean dealer;
+	private BlindEnum blind;
 	private ActionPlayer action;
 	private Boolean allIn;
 	private Double totalBet;
@@ -16,18 +16,19 @@ public class RoundPlayer {
 		this.totalBet = 0.0;
 	}
 
-	public RoundPlayer(Long id, Round round, HandPlayer handPlayer, Boolean smallBlind, Boolean bigBlind,
-			Boolean dealer, ActionPlayer action, Boolean allIn, Double totalBet) {
+	public RoundPlayer(Long id, Round round, HandPlayer handPlayer, BlindEnum blind, ActionPlayer action, Boolean allIn, Double totalBet) {
 		super();
 		this.id = id;
 		this.round = round;
 		this.handPlayer = handPlayer;
-		this.smallBlind = smallBlind;
-		this.bigBlind = bigBlind;
-		this.dealer = dealer;
+		this.blind = blind;
 		this.action = action;
 		this.allIn = allIn;
 		this.totalBet = totalBet;
+	}
+	
+	public RoundPlayer(Long id, Round round, HandPlayer handPlayer, Double totalBet) {
+		this(id, round, handPlayer, BlindEnum.FIRST_ROUND, null, false, totalBet);
 	}
 
 	public Long getId() {
@@ -53,29 +54,13 @@ public class RoundPlayer {
 	public void setHandPlayer(HandPlayer handPlayer) {
 		this.handPlayer = handPlayer;
 	}
-
-	public Boolean getSmallBlind() {
-		return smallBlind;
+	
+	public BlindEnum getBlind() {
+		return blind;
 	}
 
-	public void setSmallBlind(Boolean smallBlind) {
-		this.smallBlind = smallBlind;
-	}
-
-	public Boolean getBigBlind() {
-		return bigBlind;
-	}
-
-	public void setBigBlind(Boolean bigBlind) {
-		this.bigBlind = bigBlind;
-	}
-
-	public Boolean getDealer() {
-		return dealer;
-	}
-
-	public void setDealer(Boolean dealer) {
-		this.dealer = dealer;
+	public void setBlind(BlindEnum blind) {
+		this.blind = blind;
 	}
 
 	public ActionPlayer getAction() {
