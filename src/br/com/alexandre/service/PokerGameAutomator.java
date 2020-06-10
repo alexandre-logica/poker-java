@@ -85,11 +85,15 @@ public class PokerGameAutomator {
 				case 2:
 					handPlayer.setBlind(BlindEnum.BIG);
 					break;
+				case 3:
+					handPlayer.setBlind(BlindEnum.UNDER_THE_GUN);
+					break;
 				default:
+					handPlayer.setBlind(BlindEnum.MIDDLE);
 					break;
 			}
 			if(tablePlayer.getDealerPosition().equals(table.getTablePlayers().size()))
-				handPlayer.setBlind(BlindEnum.DEALER);;
+				handPlayer.setDealer(true);
 			handPlayers.add(handPlayer);
 		}
 		return handPlayers;

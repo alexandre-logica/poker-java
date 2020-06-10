@@ -2,13 +2,13 @@ package br.com.alexandre.enuns;
 
 public enum BlindEnum {
 
+	DEALER("DL"),
 	SMALL("SM"),
-	SMALL_COMPLEMENT("SC"),
 	BIG("BG"),
-	BIG_COMPLEMENT("BC"),
-	FIRST_ROUND("FR"),
-	ROUNDS("RS"),
-	DEALER("DL");
+	UNDER_THE_GUN("UG"),
+	MIDDLE("MD"),
+	CUT_OFF("CT"),
+	ROUNDS("RS");
 	
 	private String value;
 	

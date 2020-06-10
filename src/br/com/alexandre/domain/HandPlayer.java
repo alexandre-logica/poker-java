@@ -18,13 +18,14 @@ public class HandPlayer {
 	private Double totalBet;
 	private List<Card> playerHandCards;
 	private BlindEnum blind;
+	private Boolean dealer;
 	
 	public HandPlayer() {
 		
 	}
 	
 	public HandPlayer(Long id, Hand hand, TablePlayer tablePlayer, List<Card> cards, StatusEnum status, Boolean winner,
-					  HandRanking handRanking, Double totalBet, List<Card> playerHandCards, BlindEnum blind) {
+					  HandRanking handRanking, Double totalBet, List<Card> playerHandCards, BlindEnum blind, Boolean dealer) {
 		super();
 		this.id = id;
 		this.hand = hand;
@@ -36,11 +37,12 @@ public class HandPlayer {
 		this.totalBet = totalBet;
 		this.playerHandCards = playerHandCards;
 		this.blind = blind;
+		this.dealer = dealer;
 	}
 	
 	public HandPlayer(Long id, Hand hand, TablePlayer tablePlayer) {
 		this(id, hand, tablePlayer, new ArrayList<Card>(), StatusEnum.IN, false, new HandRanking(),
-			 0.0, new ArrayList<Card>(), BlindEnum.FIRST_ROUND);
+			 0.0, new ArrayList<Card>(), BlindEnum.MIDDLE, false);
 	}
 	
 	public Long getId() {
@@ -121,6 +123,14 @@ public class HandPlayer {
 
 	public void setBlind(BlindEnum blind) {
 		this.blind = blind;
+	}
+
+	public Boolean getDealer() {
+		return dealer;
+	}
+
+	public void setDealer(Boolean dealer) {
+		this.dealer = dealer;
 	}
 	
 }
