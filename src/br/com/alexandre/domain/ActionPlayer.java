@@ -62,30 +62,27 @@ public abstract class ActionPlayer {
 			minimumBet = roundPlayer.getRound().getCurrentBet();
 		else 
 			minimumBet = hand.getCurrentBigBlind();
+		
+		if((roundPlayer.getHandPlayer().getTablePlayer().getChips() + roundPlayer.getTotalBet()) < minimumBet)
+			minimumBet = roundPlayer.getHandPlayer().getTablePlayer().getChips();
 	}
 	
 	private void checkBet(Scanner sc) {
 		System.out.println("Pot: "+hand.getPot());
 		System.out.println("Total chips: "+roundPlayer.getHandPlayer().getTablePlayer().getChips());
-		System.out.println("Value already betted: "+roundPlayer.getHandPlayer().getTotalBet());
+		System.out.println("Value already betted in this hand: "+roundPlayer.getHandPlayer().getTotalBet());
 		System.out.println("Value already betted in this round: "+roundPlayer.getTotalBet());
+		System.out.println("Minimum bet: "+(minimumBet - roundPlayer.getTotalBet()));
 		System.out.println("Type your bet: ");
 		bet = sc.nextDouble();
-		if((roundPlayer.getHandPlayer().getTablePlayer().getChips() + roundPlayer.getTotalBet()) < minimumBet) {
-			if(!bet.equals(roundPlayer.getHandPlayer().getTablePlayer().getChips())) {
-				System.out.println("Minimum bet (all in): "+roundPlayer.getHandPlayer().getTablePlayer().getChips());
-			}else{
-				if(bet > roundPlayer.getRound().getCurrentBet())
-					roundPlayer.getRound().setCurrentBet(bet);
-			}
-		}else if((roundPlayer.getTotalBet() + bet) < minimumBet) {
-			System.out.println("Minimum bet: "+minimumBet);
+		if((roundPlayer.getTotalBet() + bet) < minimumBet) {
+			System.out.println("Current bet: "+minimumBet);
+			System.out.println("Minimum bet: "+(minimumBet - roundPlayer.getTotalBet()));
 		}else if(bet > roundPlayer.getHandPlayer().getTablePlayer().getChips()) {
 			System.out.println("Maximum bet (all in) : "+roundPlayer.getHandPlayer().getTablePlayer().getChips());
-		}else if((roundPlayer.getTotalBet() + bet) > minimumBet && ((roundPlayer.getTotalBet() + bet) - minimumBet) < hand.getCurrentBigBlind()
-				 && roundPlayer.getRound().getCurrentBet() >= hand.getCurrentBigBlind()) {
-			System.out.println("To increase the bet, the minimum is: "+(minimumBet-roundPlayer.getTotalBet())+"(Required) + "+hand.getCurrentBigBlind()+"(big blind)"+
-					   "Total: "+((minimumBet-roundPlayer.getTotalBet())+hand.getCurrentBigBlind()));
+		}else if((roundPlayer.getTotalBet() + bet) > minimumBet && (roundPlayer.getTotalBet() + bet) < (minimumBet * 2)
+				 && (roundPlayer.getHandPlayer().getTablePlayer().getChips() + roundPlayer.getTotalBet()) >= (minimumBet * 2)) {
+			System.out.println("To increase the bet, the minimum is: "+((minimumBet * 2) - roundPlayer.getTotalBet()));
 		}else {
 			corretBet = true;
 			checkAction();

@@ -20,7 +20,7 @@ public class PokerGameAutomator {
 	private List<Player> players;
 	private Deck deck;
 	private List<Card> handCards;
-	private BetingRules betingRules;
+	private BettingRules bettingRules;
 	private ShowResults showResults;
 	
 	public PokerGameAutomator(Table table, List<Player> players) {
@@ -46,8 +46,8 @@ public class PokerGameAutomator {
 		showResults = new ShowResults(hand);
 		giveOutCards(hand);
 		showResults.showPlayerCards();
-		betingRules = new BetingRules(hand);
-		hand.setWinners(betingRules.runRounds());
+		bettingRules = new BettingRules(hand);
+		hand.setWinners(bettingRules.runRounds());
 		showResults = new ShowResults(hand);
 		showResults.showHandWinners();
 		return hand;

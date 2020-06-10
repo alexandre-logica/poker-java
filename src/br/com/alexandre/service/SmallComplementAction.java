@@ -20,18 +20,22 @@ public class SmallComplementAction extends ActionPlayer{
 	
 	@Override
 	public void checkAction() {
-		if((roundPlayer.getTotalBet() + bet) < minimumBet) {
-			System.out.println("Minimum bet: "+minimumBet);
-			corretBet = false;
-		}
+//		if(bet < minimumBet) {
+//			System.out.println("Minimum bet: "+minimumBet);
+//			corretBet = false;
+//		}else if(bet > minimumBet && (bet - minimumBet) < hand.getCurrentBigBlind()) {
+//			corretBet = false;
+//			System.out.println("To increase the bet, the minimum is: "+ minimumBet +"(Required) + "+hand.getCurrentBigBlind()+"(big blind)"+
+//					           "Total: "+(minimumBet + hand.getCurrentBigBlind()));
+//		}
 	}
 	
-	@Override
-	public void setMinimumBet() {
-		if(roundPlayer.getRound().getCurrentBet() > hand.getCurrentBigBlind() / 2)
-			minimumBet = roundPlayer.getRound().getCurrentBet();
-		else 
-			minimumBet = hand.getCurrentBigBlind() / 2;
-	}
+//	@Override
+//	public void setMinimumBet() {
+//		if(roundPlayer.getRound().getCurrentBet() > hand.getCurrentBigBlind())
+//			minimumBet = roundPlayer.getRound().getCurrentBet() - hand.getCurrentBigBlind() / 2;
+//		else 
+//			minimumBet = hand.getCurrentBigBlind() / 2;
+//	}
 
 }
