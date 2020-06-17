@@ -63,7 +63,7 @@ public class BettingRules {
 		return round.gethandWinner();
 	}
 	
-	private List<HandPlayer> checkMultipleWinners(List<HandRanking> handRankings){
+	public List<HandPlayer> checkMultipleWinners(List<HandRanking> handRankings){
 		List<HandPlayer> winners = new ArrayList<>();
 		Collections.sort(handRankings, Collections.reverseOrder());
 		if(handRankings.get(0).getValue().equals(handRankings.get(1).getValue())) {
@@ -93,33 +93,35 @@ public class BettingRules {
 		Long id = 0L;
 		Integer roundPosition = 0;
 		for (HandPlayer handPlayer : round.getHand().getHandPlayers()) {
-			if(round.getNumber().equals(1)) {
-				switch (handPlayer.getBlind()) {
-				case SMALL:
-					roundPlayer = new SmallAction(++id, round, handPlayer, round.getHand().getHandPlayers().size() - 1);
-					break;
-				case BIG:
-					roundPlayer = new BigAction(++id, round, handPlayer, round.getHand().getHandPlayers().size());
-					break;
-				default:
-					roundPlayer = new RoundPlayer(++id, round, handPlayer);
-					if(handPlayer.getDealer())
-						roundPlayer.setRoundPosition(round.getHand().getHandPlayers().size() - 2);
-					else
-						roundPlayer.setRoundPosition(++roundPosition);
-					break;
+			if(handPlayer.getStatus().equals(StatusEnum.IN)) {
+				if(round.getNumber().equals(1)) {
+					switch (handPlayer.getBlind()) {
+					case SMALL:
+						roundPlayer = new SmallAction(++id, round, handPlayer, round.getHand().getHandPlayers().size() - 1);
+						break;
+					case BIG:
+						roundPlayer = new BigAction(++id, round, handPlayer, round.getHand().getHandPlayers().size());
+						break;
+					default:
+						roundPlayer = new RoundPlayer(++id, round, handPlayer);
+						if(handPlayer.getDealer())
+							roundPlayer.setRoundPosition(round.getHand().getHandPlayers().size() - 2);
+						else
+							roundPlayer.setRoundPosition(++roundPosition);
+						break;
+					}
+				}else {
+					roundPlayer = new RoundPlayer(++id, round, handPlayer, ++roundPosition);
 				}
-			}else {
-				roundPlayer = new RoundPlayer(++id, round, handPlayer, ++roundPosition);
+				roundPlayers.add(roundPlayer);
 			}
-			roundPlayers.add(roundPlayer);
 		}
 		Collections.sort(roundPlayers);
 		return roundPlayers;
 	}
 	
 	private void checkPlayerBet(Map<Long, Double> playerMap, RoundPlayer roundPlayer) {
-		if(roundPlayer.getActionEnum().equals(ActionEnum.FOLD))
+		if(roundPlayer.getActionEnum().equals(ActionEnum.FOLD) || roundPlayer.getSmallerAllIn())
 			playerMap.remove(roundPlayer.getId());
 		else
 			playerMap.put(roundPlayer.getId(), roundPlayer.getTotalBet());
@@ -143,8 +145,10 @@ public class BettingRules {
 		Map<Long, Double> playerMap = new HashMap<Long, Double>();
 		while(!sameBet) {
 			for(RoundPlayer roundPlayer : roundPlayers) {
-				roundPlayer.action();
-				checkPlayerBet(playerMap, roundPlayer);
+				if(roundPlayer.getHandPlayer().getStatus().equals(StatusEnum.IN)) {
+					roundPlayer.action();
+					checkPlayerBet(playerMap, roundPlayer);
+				}
 			}
 			sameBet = checkSameBet(playerMap);
 		}

@@ -15,14 +15,13 @@ public class RoundPlayer implements Comparable<RoundPlayer>{
 	protected BlindEnum blind;
 	protected ActionEnum actionEnum;
 	protected Boolean allIn = false;
+	protected Boolean smallerAllIn = false;
 	protected Double totalBet = 0.0;
 	protected Double bet = 0.0;
 	protected Boolean canCheck = false;
 	protected Boolean canFold = true;
 	protected String msg = "b for bet | f for fold";
 	protected Double minimumBet = 0.0;
-	protected Boolean corretBet = false;
-	
 	
 	public RoundPlayer() {
 		super();
@@ -91,6 +90,14 @@ public class RoundPlayer implements Comparable<RoundPlayer>{
 		this.allIn = allIn;
 		round.setAllIn(allIn);
 	}
+	
+	public Boolean getSmallerAllIn() {
+		return smallerAllIn;
+	}
+
+	public void setSmallerAllIn(Boolean smallerAllIn) {
+		this.smallerAllIn = smallerAllIn;
+	}
 
 	public Double getTotalBet() {
 		return totalBet;
@@ -141,10 +148,11 @@ public class RoundPlayer implements Comparable<RoundPlayer>{
 			minimumBet = handPlayer.getHand().getCurrentBigBlind();
 		
 		if((handPlayer.getTablePlayer().getChips() + totalBet) < minimumBet)
-			minimumBet = handPlayer.getTablePlayer().getChips();
+			minimumBet = handPlayer.getTablePlayer().getChips() + totalBet;
 	}
 	
-	private void checkBet(Scanner sc) {
+	private Boolean checkBet(Scanner sc) {
+		Boolean corretBet = false;
 		System.out.println("Pot: "+handPlayer.getHand().getPot());
 		System.out.println("Total chips: "+handPlayer.getTablePlayer().getChips());
 		System.out.println("Value already betted in this hand: "+handPlayer.getTotalBet());
@@ -153,8 +161,11 @@ public class RoundPlayer implements Comparable<RoundPlayer>{
 		System.out.println("Type your bet: ");
 		bet = sc.nextDouble();
 		if((totalBet + bet) < minimumBet) {
-			System.out.println("Current bet: "+minimumBet);
-			System.out.println("Minimum bet: "+(minimumBet - totalBet));
+			System.out.println("Current bet: "+round.getCurrentBet());
+			if((handPlayer.getTablePlayer().getChips() + totalBet) < round.getCurrentBet())
+				System.out.println("Minimum bet (all in): "+(minimumBet - totalBet));
+			else
+				System.out.println("Minimum bet: "+(minimumBet - totalBet));
 		}else if(bet > handPlayer.getTablePlayer().getChips()) {
 			System.out.println("Maximum bet (all in) : "+handPlayer.getTablePlayer().getChips());
 		}else if((totalBet + bet) > minimumBet && (totalBet + bet) < (minimumBet * 2)) {
@@ -168,10 +179,12 @@ public class RoundPlayer implements Comparable<RoundPlayer>{
 		}else {
 			corretBet = true;
 		}
+		return corretBet;
 	}
 	
 	protected void getPlayerAction() {
 		Boolean corretAction = false;
+		Boolean corretBet = false;
 		while(!corretAction) {
 			try {
 				Scanner sc = new Scanner(System.in);
@@ -181,10 +194,12 @@ public class RoundPlayer implements Comparable<RoundPlayer>{
 					corretAction = true;
 					setMinimumBet();
 					while(!corretBet) {
-						checkBet(sc);
+						corretBet = checkBet(sc);
 						if(corretBet) {
 							if(handPlayer.getTablePlayer().getChips().equals(bet)) {
-								setAllIn(true);;
+								setAllIn(true);
+								if(bet < round.getCurrentBet())
+									setSmallerAllIn(true);
 								round.setAllInValue(bet);
 								System.out.println("All in by "+handPlayer.getTablePlayer().getPlayer().getNickname());
 								System.out.println("Total: "+ (totalBet + bet) + "chips");
@@ -192,7 +207,8 @@ public class RoundPlayer implements Comparable<RoundPlayer>{
 							actionEnum = ActionEnum.BET;
 							handPlayer.getTablePlayer().decreaseChips(bet);;
 							setTotalBet(bet);
-							round.setCurrentBet(totalBet);
+							if(totalBet > round.getCurrentBet())
+								round.setCurrentBet(totalBet);
 							handPlayer.getHand().setPot(bet);
 						}
 					}

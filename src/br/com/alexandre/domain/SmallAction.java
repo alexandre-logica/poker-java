@@ -16,7 +16,6 @@ public class SmallAction extends RoundPlayer{
 	
 	@Override
 	protected void init() {
-		// TODO Auto-generated method stub
 		super.init();
 		System.out.println("Small blind mandatory");
 		System.out.println("Value: "+handPlayer.getHand().getCurrentBigBlind()/2);

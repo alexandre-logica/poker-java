@@ -3,13 +3,9 @@ package br.com.alexandre.service;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import br.com.alexandre.domain.Card;
@@ -22,35 +18,41 @@ import br.com.alexandre.util.Util;
 public class HandRankingRules {
 	
 	private List<Card> playerHand;
+	private Map<Integer, Long> rankCount;
+	private Map<String, Long> suitCount;
+	private List<Card> flushCards;
+	private List<Card> straightCards;
+	private List<Card> straightFlushCards;
+	private List<Integer> straightSequence;
+	private List<Integer> ranks = new ArrayList<Integer>();
+	private List<String> suits = new ArrayList<String>();
 	
-	public HandRankingRules() {
-
-	}
-
 	public HandRanking setPlayerScore(List<Card> playerHand) {
 		List<HandRanking> pairs = null;
 		List<HandRanking> triplets = null;
 		List<HandRanking> fours = null;
 		this.playerHand = playerHand;
+		setPreviosValues();
 		Map<String, List<HandRanking>> amountOfKinds = checkAmountOfKind();
 		if (amountOfKinds != null) {
 			pairs = amountOfKinds.get("pairs");
 			triplets = amountOfKinds.get("triplets");
 			fours = amountOfKinds.get("fours");
 		}
-		HandRanking straightHand = checkTypeOfStraight();
-		HandRanking flushHand = checkFlush();
+		checkTypeOfStraightAndFlush();
 		HandRanking tripletHand = null;
 		HandRanking handRanking = null;
 
-		if (straightHand != null && straightHand.getType().equals(ScoreHandEnum.ROYAL_FLUSH)) {
-			// set ROYAL_FLUSH
-			handRanking = straightHand;
-			handRanking.setValue(calcValue(handRanking));
-			return handRanking;
-		} else if (straightHand != null && straightHand.getType().equals(ScoreHandEnum.STRAIGHT_FLUSH)) {
-			// set STRAIGHT_FLUSH
-			handRanking = straightHand;
+		if (straightFlushCards != null && straightFlushCards.size() >= 5) {
+			handRanking = new HandRanking();
+			if(straightFlushCards.get(0).getRank().equals(14)) {
+				// set ROYAL_FLUSH
+				handRanking.setType(ScoreHandEnum.ROYAL_FLUSH);
+			}else {
+				// set STRAIGHT_FLUSH
+				handRanking.setType(ScoreHandEnum.STRAIGHT_FLUSH);
+			}
+			handRanking.setHandCards(straightFlushCards.subList(0, 5));
 			handRanking.setValue(calcValue(handRanking));
 			return handRanking;
 		} else if (fours != null && fours.size() > 0) {
@@ -85,15 +87,18 @@ public class HandRankingRules {
 				tripletHand = handRanking;
 			}
 		} 
-		if (flushHand != null) {
+		if (flushCards != null && flushCards.size() >= 5) {
 			// set FLUSH
-			handRanking = flushHand;
-			handRanking.setKickers(handRanking.getHandCards());
+			handRanking = new HandRanking();
+			handRanking.setType(ScoreHandEnum.FLUSH);
+			handRanking.setHandCards(flushCards.subList(0, 5));
 			handRanking.setValue(calcValue(handRanking));
 			return handRanking;
-		} else if (straightHand != null && straightHand.getType().equals(ScoreHandEnum.STRAIGHT)) {
+		} else if (straightCards != null && straightCards.size() >= 5) {
 			// set STRAIGHT
-			handRanking = straightHand;
+			handRanking = new HandRanking();
+			handRanking.setType(ScoreHandEnum.STRAIGHT);
+			handRanking.setHandCards(straightCards.subList(0, 5));
 			handRanking.setValue(calcValue(handRanking));
 			return handRanking;
 		} else if (tripletHand != null) {
@@ -135,7 +140,6 @@ public class HandRankingRules {
 		List<HandRanking> pairs = new ArrayList<HandRanking>();
 		List<HandRanking> triplets = new ArrayList<HandRanking>();
 		List<HandRanking> fours = new ArrayList<HandRanking>();
-		Map<Integer, Long> rankCount = countRanks();
 		Map<String, List<HandRanking>> amountOfKinds = new HashMap<>();
 		for (Map.Entry<Integer, Long> entry : rankCount.entrySet()) {
 			if (entry.getValue().equals(4L)) {
@@ -172,118 +176,91 @@ public class HandRankingRules {
 		return amountOfKinds;
 	}
 	
-	private Map<Integer, Long> countRanks() {
-		List<Integer> ranks = setRanks();
-		Map<Integer, Long> rankCount = new HashMap<Integer, Long>();
+	private void setPreviosValues() {
+		for (Card card : playerHand) {
+			ranks.add(card.getRank());
+			suits.add(card.getSuit());
+		}
+		if (ranks.contains(14))
+			ranks.add(1);
 		Collections.sort(ranks, Collections.reverseOrder());
+		straightSequence = Util.orderedWithNoGap(ranks);
+		rankCount = new HashMap<Integer, Long>();
 		for (Integer rank : ranks) {
 			rankCount.put(rank, ranks.stream().filter(item -> item == rank).count());
 		}
-		// sort by value
 		rankCount = Util.sortByValueInteger(rankCount);
-		return rankCount;
-	}
-
-	private List<Integer> setRanks() {
-		List<Integer> ranks = new ArrayList<Integer>();
-		for (Card card : playerHand) {
-			ranks.add(card.getRank());
-		}
-		return ranks;
-	}
-
-	private HandRanking checkFlush() {
-		HandRanking handRanking = null;
-		String flush = "";
-		List<Card> flushCards = new ArrayList<Card>();
-		Map<String, Long> suitCount = countSuits();
-		if (suitCount.entrySet().iterator().next().getValue() >= 5) {
-			handRanking = new HandRanking();
-			flush = suitCount.entrySet().iterator().next().getKey();
-			for (Card card : playerHand) {
-				if (card.getSuit().equals(flush)) {
-					flushCards.add(card);
-				}
-			}
-			Collections.sort(flushCards, Collections.reverseOrder());
-			handRanking.setType(ScoreHandEnum.FLUSH);
-			handRanking.setHandCards(flushCards.subList(0, 5));
-		}
-
-		return handRanking;
-	}
-
-	private Map<String, Long> countSuits() {
-		List<String> suits = setSuits();
-		Map<String, Long> suitCount = new HashMap<String, Long>();
-		Collections.sort(suits, Collections.reverseOrder());
+		suitCount = new HashMap<String, Long>();
 		for (SuitsEnum suit : SuitsEnum.values()) {
 			suitCount.put(suit.getValue(), suits.stream().filter(item -> item == suit.getValue()).count());
 		}
-		// sort by value
 		suitCount = suitCount.entrySet().stream().sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
 				.collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue(), (e1, e2) -> e2, LinkedHashMap::new));
-		return suitCount;
 	}
 
-	private List<String> setSuits() {
-		List<String> suits = new ArrayList<String>();
-		for (Card card : playerHand) {
-			suits.add(card.getSuit());
-		}
-		return suits;
-	}
-
-	private List<Integer> checkStraights(List<Integer> ranks) {
-		SortedSet<Integer> straightNumbers = new TreeSet<Integer>();
-		List<Integer> straightSequence = new ArrayList<Integer>();
-		if (ranks.contains(14))
-			straightNumbers.add(1);
-		straightNumbers.addAll(ranks);
-		straightSequence = Util.orderedWithNoGap(straightNumbers);
-		return straightSequence;
-	}
-
-	private HandRanking checkTypeOfStraight() {
-		List<Integer> straightSequence = checkStraights(setRanks());
-		Set<Card> straightCards = new TreeSet<Card>();
-		List<Card> straightCardsList = new ArrayList<Card>();
-		Set<String> straightFlush = new HashSet<String>();
-		HandRanking handRanking = new HandRanking();
+	private void checkTypeOfStraightAndFlush() {
+		List<Integer> ranksFlush = new ArrayList<Integer>();
+		List<Integer> straightFlushSequence;
+		String flush = null;
 		Boolean aceIsOne = false;
-		if (straightSequence.size() == 5) {
-			if(straightSequence.contains(1)) {
-				straightSequence.set(4, 14);
-				aceIsOne = true;
-			}
-			for (Integer straightItem : straightSequence) {
-				for (Card card : playerHand) {
-					if (card.getRank().equals(straightItem)) {
-						straightCards.add(card);
-						straightFlush.add(card.getSuit());
-					}
+		// Check flush
+		if (suitCount.entrySet().iterator().next().getValue() >= 5) {
+			flush = suitCount.entrySet().iterator().next().getKey();
+			flushCards = new ArrayList<Card>();
+			for (Card card : playerHand) {
+				if (card.getSuit().equals(flush)) {
+					flushCards.add(card);
+					ranksFlush.add(card.getRank());
 				}
 			}
-			straightCardsList.addAll(straightCards);
-			Collections.sort(straightCardsList, Collections.reverseOrder());
-			if(aceIsOne) {
-				straightCardsList.add(straightCardsList.get(0));
-				straightCardsList.remove(0);
-			}
-			if (straightFlush.size() == 1) {
-				if (straightCardsList.get(0).getRank().equals(14))
-					handRanking.setType(ScoreHandEnum.ROYAL_FLUSH);
-				else 
-					handRanking.setType(ScoreHandEnum.STRAIGHT_FLUSH);
-				handRanking.setHandCards(straightCardsList);
-			} else {
-				handRanking.setType(ScoreHandEnum.STRAIGHT);
-				handRanking.setHandCards(straightCardsList);
-			}
-		} else {
-			handRanking = null;
+			Collections.sort(flushCards, Collections.reverseOrder());
 		}
-		return handRanking;
+		// Check straightFlush and straight
+		if(straightSequence.size() >= 5) {
+			if(flush != null) {
+				if (ranksFlush.contains(14))
+					ranksFlush.add(1);
+				Collections.sort(ranksFlush, Collections.reverseOrder());
+				straightFlushSequence = Util.orderedWithNoGap(ranksFlush);
+				if(straightFlushSequence.size() >= 5) {
+					straightFlushCards = new ArrayList<Card>();
+					if(straightFlushSequence.contains(1)) {
+						straightFlushSequence.set(straightFlushSequence.size()-1, 14);
+						aceIsOne = true;
+					}
+					for (Integer straightItem : straightFlushSequence) {
+						for (Card card : playerHand) {
+							if (card.getRank().equals(straightItem)) {
+								straightFlushCards.add(card);
+							}
+						}
+					}
+					Collections.sort(straightFlushCards, Collections.reverseOrder());
+					if(aceIsOne) {
+						straightFlushCards.add(straightFlushCards.get(0));
+						straightFlushCards.remove(0);
+					}
+				}
+			}else {
+				if(straightSequence.contains(1)) {
+					straightSequence.set(straightSequence.size()-1, 14);
+					aceIsOne = true;
+				}
+				straightCards = new ArrayList<Card>();
+				for (Integer straightItem : straightSequence) {
+					for (Card card : playerHand) {
+						if (card.getRank().equals(straightItem)) {
+							straightCards.add(card);
+						}
+					}
+				}
+				Collections.sort(straightCards, Collections.reverseOrder());
+				if(aceIsOne) {
+					straightCards.add(straightCards.get(0));
+					straightCards.remove(0);
+				}
+			}
+		}
 	}
 
 	private List<Card> getCardsByRank(Integer rank) {
