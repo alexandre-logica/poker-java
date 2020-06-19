@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import br.com.alexandre.domain.Card;
@@ -92,6 +94,7 @@ public class HandRankingRules {
 			handRanking = new HandRanking();
 			handRanking.setType(ScoreHandEnum.FLUSH);
 			handRanking.setHandCards(flushCards.subList(0, 5));
+			handRanking.setKickers(handRanking.getHandCards());
 			handRanking.setValue(calcValue(handRanking));
 			return handRanking;
 		} else if (straightCards != null && straightCards.size() >= 5) {
@@ -136,6 +139,17 @@ public class HandRankingRules {
 		}
 	}
 	
+	@SuppressWarnings("unused")
+	private void testPlayerScore() {
+		System.out.println("straightFlushCards: " + straightFlushCards);
+		System.out.println("flushCards: " + flushCards);
+		System.out.println("rankCount: " + rankCount);
+		System.out.println("straightCards: " + straightCards);
+		System.out.println("straightSequence: " + straightSequence);
+		System.out.println("ranks: " + ranks);
+		System.out.println("suits: " + suits);
+	}
+	
 	private Map<String, List<HandRanking>> checkAmountOfKind() {
 		List<HandRanking> pairs = new ArrayList<HandRanking>();
 		List<HandRanking> triplets = new ArrayList<HandRanking>();
@@ -177,14 +191,16 @@ public class HandRankingRules {
 	}
 	
 	private void setPreviosValues() {
+		SortedSet<Integer> straightSetNumbers = new TreeSet<Integer>();
 		for (Card card : playerHand) {
 			ranks.add(card.getRank());
 			suits.add(card.getSuit());
 		}
 		if (ranks.contains(14))
 			ranks.add(1);
-		Collections.sort(ranks, Collections.reverseOrder());
-		straightSequence = Util.orderedWithNoGap(ranks);
+		straightSetNumbers.addAll(ranks);
+		straightSequence = Util.orderedWithNoGap(straightSetNumbers);
+		Collections.sort(straightSequence, Collections.reverseOrder());
 		rankCount = new HashMap<Integer, Long>();
 		for (Integer rank : ranks) {
 			rankCount.put(rank, ranks.stream().filter(item -> item == rank).count());
@@ -217,11 +233,13 @@ public class HandRankingRules {
 		}
 		// Check straightFlush and straight
 		if(straightSequence.size() >= 5) {
-			if(flush != null) {
+			if(flush != null && flush != "") {
+				SortedSet<Integer> straightSetNumbers = new TreeSet<Integer>();
 				if (ranksFlush.contains(14))
 					ranksFlush.add(1);
-				Collections.sort(ranksFlush, Collections.reverseOrder());
-				straightFlushSequence = Util.orderedWithNoGap(ranksFlush);
+				straightSetNumbers.addAll(ranksFlush);
+				straightFlushSequence = Util.orderedWithNoGap(straightSetNumbers);
+				Collections.sort(straightFlushSequence, Collections.reverseOrder());
 				if(straightFlushSequence.size() >= 5) {
 					straightFlushCards = new ArrayList<Card>();
 					if(straightFlushSequence.contains(1)) {
@@ -230,8 +248,9 @@ public class HandRankingRules {
 					}
 					for (Integer straightItem : straightFlushSequence) {
 						for (Card card : playerHand) {
-							if (card.getRank().equals(straightItem)) {
+							if (card.getRank().equals(straightItem) && card.getSuit().equals(flush)) {
 								straightFlushCards.add(card);
+								break;
 							}
 						}
 					}
@@ -251,6 +270,7 @@ public class HandRankingRules {
 					for (Card card : playerHand) {
 						if (card.getRank().equals(straightItem)) {
 							straightCards.add(card);
+							break;
 						}
 					}
 				}
@@ -357,6 +377,7 @@ public class HandRankingRules {
 			value += (double) (card.getRank() * level);
 			level *= 10;
 		}
+		Collections.sort(kickers, Collections.reverseOrder());
 		return value;
 	}
 

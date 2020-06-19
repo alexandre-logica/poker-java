@@ -11,7 +11,6 @@ import br.com.alexandre.domain.HandCard;
 import br.com.alexandre.domain.HandPlayer;
 import br.com.alexandre.domain.HandRanking;
 import br.com.alexandre.domain.Player;
-import br.com.alexandre.domain.RoundPlayer;
 import br.com.alexandre.domain.Table;
 import br.com.alexandre.domain.TablePlayer;
 import br.com.alexandre.enuns.BlindEnum;
@@ -36,6 +35,7 @@ public class PokerGameAutomator {
 		table.setTablePlayers(createTablePlayers());
 		while (!table.getGameOver()) {
 			table.getHands().add(runHand(++count));
+			//table.getHands().add(runHandTestHandRanking(++count));
 			table.setGameOver(checkGameOver());
 		}
 		showResults = new ShowResults(table.getHands().get(table.getHands().size()-1));
@@ -49,20 +49,37 @@ public class PokerGameAutomator {
 		showResults = new ShowResults(hand);
 		giveOutCards(hand);
 		showResults.showPlayerCards();
+		bettingRules = new BettingRules(hand);
+		hand.setWinners(bettingRules.runRounds());
+		showResults = new ShowResults(hand);
+		showResults.showHandWinners();
+		return hand;
+	}
+	
+	@SuppressWarnings("unused")
+	private Hand runHandTestHandRanking(Integer count) {
+		deck = new Deck();
+		deck.shuffle();
+		Hand hand = new Hand(count, deck, table.getCurrentBigBlind());
+		showResults = new ShowResults(hand);
+		giveOutCards(hand);
+		showResults.showPlayerCards();
 		showResults.showHandCards();
 		bettingRules = new BettingRules(hand);
 		//hand.setWinners(bettingRules.runRounds());
 		
 		List<HandRanking> handRankings = new ArrayList<>();
 		for(HandPlayer player : hand.getHandPlayers()) {
+			//System.out.println("player: " + player.getTablePlayer().getPlayer().getNickname());
 			HandRankingRules handRankingHules = new HandRankingRules();
 			HandRanking handRanking = handRankingHules.setPlayerScore(player.getPlayerHandCards());
 			handRanking.setHandPlayer(player);
 			handRankings.add(handRanking);
 		}
 		hand.setWinners(bettingRules.checkMultipleWinners(handRankings));
-		//showResults = new ShowResults(hand);
+		showResults = new ShowResults(hand);
 		showResults.showHandWinners();
+		System.out.println("############### Hand Amount: "+count);
 		return hand;
 	}
 	

@@ -125,9 +125,10 @@ public class ShowResults {
 	
 	public void showHandWinners() {
 		System.out.println();
-		if(hand.getWinners().size() > 1)
+		if(hand.getWinners().size() > 1) {
 			System.out.println("************** Hand Winners **************");
-		else
+			testTiedHand();
+		}else
 			System.out.println("************** Hand Winner **************");
 		System.out.println();
 		for (HandPlayer player : hand.getWinners()) {
@@ -146,6 +147,46 @@ public class ShowResults {
 				System.out.println("All the other players fold");
 			}
 			System.out.println();
+		}
+		System.out.println();
+	}
+	
+	public void testTiedHand() {
+		for (HandPlayer player : hand.getWinners()) {
+			switch (player.getHandRanking().getType()) {
+			case ROYAL_FLUSH:
+				break;
+			case STRAIGHT_FLUSH:
+				break;
+			case FOUR_OF_KIND:
+				break;
+			case FULL_HOUSE:
+				if(hand.getWinners().size() == 4)
+					System.out.println("test");
+				break;
+			case FLUSH:
+				break;
+			case STRAIGHT:
+				if(hand.getWinners().size() == 4)
+					System.out.println("test");
+				break;
+			case THREE_OF_KIND:
+				if(hand.getWinners().size() == 4)
+					System.out.println("test");
+				break;
+			case TWO_PAIR:
+				if(hand.getWinners().size() == 4)
+					System.out.println("test");
+				break;
+			case ONE_PAIR:
+				break;
+			case HIGH_CARD:
+				if(hand.getWinners().size() == 4)
+					System.out.println("test");
+				break;
+			default:
+				break;
+			}
 		}
 	}
 	

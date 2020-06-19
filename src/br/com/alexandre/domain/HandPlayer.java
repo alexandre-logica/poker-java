@@ -132,5 +132,10 @@ public class HandPlayer {
 	public void setDealer(Boolean dealer) {
 		this.dealer = dealer;
 	}
+
+	@Override
+	public String toString() {
+		return "HandPlayer [name=" + tablePlayer.getPlayer().getNickname() + "]";
+	}
 	
 }
