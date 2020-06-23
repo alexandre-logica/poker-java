@@ -1,4 +1,4 @@
-package br.com.alexandre.enuns;
+package br.com.alexandre.domain.enums;
 
 public enum BlindEnum {
 

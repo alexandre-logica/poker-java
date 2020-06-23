@@ -6,17 +6,19 @@ public class Card implements Comparable<Card>{
 	private String suit;
 	private String symbol;
 	private String character;
+	private Boolean faceUp;
 	
 	public Card() {
 		
 	}
 
-	public Card(String suit, Integer rank, String symbol, String character) {
+	public Card(String suit, Integer rank, String symbol, String character, Boolean faceUp) {
 		super();
 		this.suit = suit;
 		this.rank = rank;
 		this.symbol = symbol;
 		this.character = character;
+		this.faceUp = faceUp;
 	}
 
 	public String getSuit() {
@@ -49,6 +51,14 @@ public class Card implements Comparable<Card>{
 
 	public void setCharacter(String character) {
 		this.character = character;
+	}
+	
+	public Boolean getFaceUp() {
+		return faceUp;
+	}
+
+	public void setFaceUp(Boolean faceUp) {
+		this.faceUp = faceUp;
 	}
 
 	@Override

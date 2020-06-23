@@ -9,7 +9,7 @@ public class Round {
 	private Double pot;
 	private Integer totalPlayers;
 	private Hand hand;
-	private List<RoundPlayer> roundPlayers = new ArrayList<RoundPlayer>();
+	private List<RoundPlayer> roundPlayers;
 	private Boolean handWinner;
 	private Boolean allIn;
 	private Double allInValue;

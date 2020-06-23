@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import br.com.alexandre.domain.Player;
+import br.com.alexandre.domain.RoundPlayer;
 import br.com.alexandre.domain.Table;
-import br.com.alexandre.enuns.GenderEnum;
 import br.com.alexandre.service.PokerGameAutomator;
 
 public class Test {
@@ -15,10 +15,10 @@ public class Test {
 		
 		
 		
-		Player p1 = new Player(1, "Alexandre", GenderEnum.MASCULINO.getValue(), "Xandão");
-		Player p2 = new Player(2, "Thales", GenderEnum.MASCULINO.getValue(), "Thalão");
-		Player p3 = new Player(3, "Julia", GenderEnum.FEMININO.getValue(), "Ju");
-		Player p4 = new Player(4, "Italo", GenderEnum.MASCULINO.getValue(), "Bonititalo");
+		Player p1 = new RoundPlayer(1, "Xandão");
+		Player p2 = new RoundPlayer(2, "Thalão");
+		Player p3 = new RoundPlayer(3, "Ju");
+		Player p4 = new RoundPlayer(4, "Bonititalo");
 		
 		List<Player> players = new ArrayList<>();
 		players.add(p1);

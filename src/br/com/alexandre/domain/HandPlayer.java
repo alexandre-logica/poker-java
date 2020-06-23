@@ -3,33 +3,31 @@ package br.com.alexandre.domain;
 import java.util.ArrayList;
 import java.util.List;
 
-import br.com.alexandre.enuns.BlindEnum;
-import br.com.alexandre.enuns.StatusEnum;
+import br.com.alexandre.domain.enums.BlindEnum;
+import br.com.alexandre.domain.enums.StatusEnum;
 
-public class HandPlayer {
-
-	private Long id;
-	private Hand hand;
-	private TablePlayer tablePlayer;
-	private List<Card> cards;
-	private StatusEnum status;
-	private Boolean winner;
-	private HandRanking handRanking;
-	private Double totalBet;
-	private List<Card> playerHandCards;
-	private BlindEnum blind;
-	private Boolean dealer;
+public class HandPlayer extends Player{
 	
-	public HandPlayer() {
-		
+	protected Hand hand;
+	protected List<Card> cards;
+	protected StatusEnum status;
+	protected Boolean winner;
+	protected HandRanking handRanking;
+	protected Double totalBet;
+	protected List<Card> playerHandCards;
+	protected BlindEnum blind;
+	protected Boolean dealer;
+	
+	public HandPlayer(Integer id, String nickname) {
+		super(id, nickname);
 	}
 	
-	public HandPlayer(Long id, Hand hand, TablePlayer tablePlayer, List<Card> cards, StatusEnum status, Boolean winner,
+	public HandPlayer() {
+	}
+	
+	public HandPlayer(Hand hand, List<Card> cards, StatusEnum status, Boolean winner,
 					  HandRanking handRanking, Double totalBet, List<Card> playerHandCards, BlindEnum blind, Boolean dealer) {
-		super();
-		this.id = id;
 		this.hand = hand;
-		this.tablePlayer = tablePlayer;
 		this.cards = cards;
 		this.status = status;
 		this.winner = winner;
@@ -40,33 +38,17 @@ public class HandPlayer {
 		this.dealer = dealer;
 	}
 	
-	public HandPlayer(Long id, Hand hand, TablePlayer tablePlayer) {
-		this(id, hand, tablePlayer, new ArrayList<Card>(), StatusEnum.IN, false, new HandRanking(),
+	public HandPlayer(Hand hand) {
+		this(hand, new ArrayList<Card>(), StatusEnum.IN, false, new HandRanking(),
 			 0.0, new ArrayList<Card>(), BlindEnum.MIDDLE, false);
 	}
 	
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
 	public Hand getHand() {
 		return hand;
 	}
 
 	public void setHand(Hand hand) {
 		this.hand = hand;
-	}
-
-	public TablePlayer getTablePlayer() {
-		return tablePlayer;
-	}
-
-	public void setTablePlayer(TablePlayer tablePlayer) {
-		this.tablePlayer = tablePlayer;
 	}
 
 	public List<Card> getCards() {
@@ -106,7 +88,7 @@ public class HandPlayer {
 	}
 
 	public void setTotalBet(Double totalBet) {
-		this.totalBet += totalBet;
+		this.totalBet = totalBet;
 	}
 
 	public List<Card> getPlayerHandCards() {
@@ -132,10 +114,26 @@ public class HandPlayer {
 	public void setDealer(Boolean dealer) {
 		this.dealer = dealer;
 	}
+	
+	public void increaseTotalBet(Double totalBet) {
+		this.totalBet += totalBet;
+	}
 
+	public void cleanUp(Hand hand) {
+		this.hand = hand;
+		this.cards = new ArrayList<Card>();
+		this.status = StatusEnum.IN;
+		this.winner = false;
+		this.handRanking = new HandRanking();
+		this.totalBet = 0.0;
+		this.playerHandCards = new ArrayList<Card>();
+		this.blind = null;
+		this.dealer = false;
+	}
+	
 	@Override
 	public String toString() {
-		return "HandPlayer [name=" + tablePlayer.getPlayer().getNickname() + "]";
+		return "HandPlayer [name=" + getNickname() + "]";
 	}
 	
 }

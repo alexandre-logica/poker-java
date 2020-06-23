@@ -1,12 +1,12 @@
-package br.com.alexandre.service;
+package br.com.alexandre.util;
 
 import br.com.alexandre.domain.Card;
 import br.com.alexandre.domain.Hand;
 import br.com.alexandre.domain.HandCard;
 import br.com.alexandre.domain.HandPlayer;
 import br.com.alexandre.domain.Table;
-import br.com.alexandre.enuns.StatusEnum;
-import br.com.alexandre.enuns.TypeCardEnum;
+import br.com.alexandre.domain.enums.StatusEnum;
+import br.com.alexandre.domain.enums.TypeCardEnum;
 
 public class ShowResults {
 
@@ -104,9 +104,9 @@ public class ShowResults {
 		System.out.println("************** Players Cards **************");
 		System.out.println();
 		for (HandPlayer player : hand.getHandPlayers()) {
-			System.out.println("Player: " + player.getTablePlayer().getPlayer().getNickname());
-			System.out.println("Position: " + player.getTablePlayer().getPosition());
-			System.out.println("Chips: " + player.getTablePlayer().getChips());
+			System.out.println("Player: " + player.getNickname());
+			System.out.println("Position: " + player.getTablePosition());
+			System.out.println("Chips: " + player.getChips());
 			if(player.getDealer())
 				System.out.println("Dealer");
 			System.out.print("Cards: | " + player.getCards().get(0).getCharacter() + "-" + player.getCards().get(0).getSymbol());
@@ -132,7 +132,7 @@ public class ShowResults {
 			System.out.println("************** Hand Winner **************");
 		System.out.println();
 		for (HandPlayer player : hand.getWinners()) {
-			System.out.println("Player: " + player.getTablePlayer().getPlayer().getNickname());
+			System.out.println("Player: " + player.getNickname());
 			System.out.println("Pot: " + (hand.getPot() / hand.getWinners().size()));
 			if(player.getStatus().equals(StatusEnum.CARD_WINNER)) {
 				System.out.println("Hand game: " + player.getHandRanking().getType().getName());
@@ -194,9 +194,9 @@ public class ShowResults {
 		System.out.println();
 		System.out.println("************** Winner **************");
 		System.out.println();
-		System.out.println("Player: " + table.getTablePlayers().get(0).getPlayer().getNickname());
+		System.out.println("Player: " + table.getPlayers().get(0).getNickname());
 		System.out.println();
-		System.out.println("Player total prize: " + table.getTablePlayers().get(0).getChips());
+		System.out.println("Player total prize: " + table.getPlayers().get(0).getChips());
 		System.out.println();
 	}
 	

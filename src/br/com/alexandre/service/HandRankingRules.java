@@ -12,9 +12,9 @@ import java.util.stream.Collectors;
 
 import br.com.alexandre.domain.Card;
 import br.com.alexandre.domain.HandRanking;
-import br.com.alexandre.enuns.LevelValueEnum;
-import br.com.alexandre.enuns.ScoreHandEnum;
-import br.com.alexandre.enuns.SuitsEnum;
+import br.com.alexandre.domain.enums.LevelValueEnum;
+import br.com.alexandre.domain.enums.ScoreHandEnum;
+import br.com.alexandre.domain.enums.SuitsEnum;
 import br.com.alexandre.util.Util;
 
 public class HandRankingRules {

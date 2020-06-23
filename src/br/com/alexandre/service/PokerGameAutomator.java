@@ -12,9 +12,9 @@ import br.com.alexandre.domain.HandPlayer;
 import br.com.alexandre.domain.HandRanking;
 import br.com.alexandre.domain.Player;
 import br.com.alexandre.domain.Table;
-import br.com.alexandre.domain.TablePlayer;
-import br.com.alexandre.enuns.BlindEnum;
-import br.com.alexandre.enuns.TypeCardEnum;
+import br.com.alexandre.domain.enums.BlindEnum;
+import br.com.alexandre.domain.enums.TypeCardEnum;
+import br.com.alexandre.util.ShowResults;
 
 public class PokerGameAutomator {
 	
@@ -32,7 +32,7 @@ public class PokerGameAutomator {
 	
 	public void playGame() {
 		Integer count = 0;
-		table.setTablePlayers(createTablePlayers());
+		table.setPlayers(setTablePlayers());
 		while (!table.getGameOver()) {
 			table.getHands().add(runHand(++count));
 			//table.getHands().add(runHandTestHandRanking(++count));
@@ -83,19 +83,24 @@ public class PokerGameAutomator {
 		return hand;
 	}
 	
-	private List<TablePlayer> createTablePlayers() {
-		List<TablePlayer> tablePlayers = new ArrayList<TablePlayer>();
+	private List<Player> setTablePlayers() {
+		ArrayList<Player> tablePlayers = new ArrayList<Player>();
 		Collections.shuffle(players);
 		for (int i = 0; i < players.size(); i++) {
-			tablePlayers.add(new TablePlayer(table, players.get(i), i+1, i+1, table.getInitialChipsPlayers(), false));
+			players.get(i).setTable(table);
+			players.get(i).setTablePosition(i+1);
+			players.get(i).setDealerPosition(i+1);
+			players.get(i).setChips(table.getInitialChipsPlayers());
+			players.get(i).setWinner(false);
+			tablePlayers.add(players.get(i));
 		}
 		return tablePlayers;
 	}
 	
 	private void goForwardTablePlayerPosition() {
-		for (TablePlayer player : table.getTablePlayers()) {
+		for (Player player : table.getPlayers()) {
 			if(player.getDealerPosition().equals(1))
-				player.setDealerPosition(table.getTablePlayers().size());
+				player.setDealerPosition(table.getPlayers().size());
 			else
 				player.setDealerPosition(player.getDealerPosition()-1);
 		}
@@ -103,10 +108,11 @@ public class PokerGameAutomator {
 	
 	private List<HandPlayer> createHandPlayers(Hand hand) {
 		goForwardTablePlayerPosition();
-		Collections.sort(table.getTablePlayers());
+		Collections.sort(table.getPlayers(), Player.dealerPositionCompare);
 		List<HandPlayer> handPlayers = new ArrayList<HandPlayer>();
-		for (TablePlayer tablePlayer : table.getTablePlayers()) {
-			HandPlayer handPlayer = new HandPlayer(new Long(tablePlayer.getDealerPosition()), hand, tablePlayer);
+		for (Player tablePlayer : table.getPlayers()) {
+			HandPlayer handPlayer = (HandPlayer) tablePlayer;
+			handPlayer.cleanUp(hand);
 			switch (tablePlayer.getDealerPosition()) {
 				case 1:
 					handPlayer.setBlind(BlindEnum.SMALL);;
@@ -121,7 +127,7 @@ public class PokerGameAutomator {
 					handPlayer.setBlind(BlindEnum.MIDDLE);
 					break;
 			}
-			if(tablePlayer.getDealerPosition().equals(table.getTablePlayers().size()))
+			if(tablePlayer.getDealerPosition().equals(table.getPlayers().size()))
 				handPlayer.setDealer(true);
 			handPlayers.add(handPlayer);
 		}
@@ -129,11 +135,11 @@ public class PokerGameAutomator {
 	}
 	
 	private Boolean checkGameOver() {
-		table.getTablePlayers().removeIf(p -> (p.getChips().equals(0.0)));
-		for (int i = 0; i < table.getTablePlayers().size(); i++) {
-			table.getTablePlayers().get(i).setDealerPosition(i+1);
+		table.getPlayers().removeIf(p -> (p.getChips().equals(0.0)));
+		for (int i = 0; i < table.getPlayers().size(); i++) {
+			table.getPlayers().get(i).setDealerPosition(i+1);
 		}
-		if(table.getTablePlayers().size() == 1)
+		if(table.getPlayers().size() == 1)
 			return true;
 		else
 			return false;

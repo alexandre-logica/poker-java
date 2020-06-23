@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import br.com.alexandre.enuns.RankEnum;
-import br.com.alexandre.enuns.SuitsEnum;
+import br.com.alexandre.domain.enums.RankEnum;
+import br.com.alexandre.domain.enums.SuitsEnum;
 
 public class Deck {
 
@@ -22,6 +22,7 @@ public class Deck {
 				card.setCharacter(rank.getCharacter());
 				card.setSuit(suit.getValue());
 				card.setSymbol(suit.getSymbol());
+				card.setFaceUp(false);
 				FULLDECK.add(card);
 			}
 		}

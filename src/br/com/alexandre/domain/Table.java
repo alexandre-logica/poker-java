@@ -4,10 +4,10 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Table {
+public class Table{
 
 	private Long id;
-	private List<TablePlayer> tablePlayers;
+	private List<Player> players;
 	private List<Hand> hands;
 	private Double initialBigBlind;
 	private Double initialChipsPlayers;
@@ -17,10 +17,10 @@ public class Table {
 	private Integer increaseBlindMinutes;
 	private Double currentBigBlind;
 	
-	public Table(Long id, List<TablePlayer> tablePlayers, List<Hand> hands, Double initialBigBlind, Double initialChipsPlayers,  
+	public Table(Long id, List<Player> players, List<Hand> hands, Double initialBigBlind, Double initialChipsPlayers,  
 			     LocalDateTime gameStart, LocalDateTime gameFinish, Boolean gameOver, Integer increaseBlindMinutes, Double currentBigBlind) {
 		this.id = id;
-		this.tablePlayers = tablePlayers;
+		this.players = players;
 		this.hands = hands;
 		this.initialBigBlind = initialBigBlind;
 		this.initialChipsPlayers= initialChipsPlayers;
@@ -32,7 +32,7 @@ public class Table {
 	}
 	
 	public Table(Long id, Double initialBigBlind, Double initialChipsPlayers, LocalDateTime gameStart) {
-		this(id, new ArrayList<TablePlayer>(), new ArrayList<Hand>(), initialBigBlind, initialChipsPlayers, gameStart, null, false, 2, initialBigBlind);
+		this(id, new ArrayList<Player>(), new ArrayList<Hand>(), initialBigBlind, initialChipsPlayers, gameStart, null, false, 2, initialBigBlind);
 	}
 
 	public Long getId() {
@@ -43,12 +43,12 @@ public class Table {
 		this.id = id;
 	}
 	
-	public List<TablePlayer> getTablePlayers() {
-		return tablePlayers;
+	public List<Player> getPlayers() {
+		return players;
 	}
 
-	public void setTablePlayers(List<TablePlayer> tablePlayers) {
-		this.tablePlayers = tablePlayers;
+	public void setPlayers(List<Player> players) {
+		this.players = players;
 	}
 
 	public List<Hand> getHands() {
